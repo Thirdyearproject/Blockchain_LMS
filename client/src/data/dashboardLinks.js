@@ -1,0 +1,50 @@
+export const sidebarLinks = [
+  {
+    id: 1,
+    name: "Dashboard",
+    path: "/dashboard/my-dashboard",
+    icon: "MdOutlineDashboard",
+  },
+  {
+    id: 2,
+    name: "Learn",
+    path: "/dashboard/learn",
+    // type: "instructor",
+    icon: "MdMenuBook",
+  },
+  {
+    id: 3,
+    name: "Practice",
+    path: "/dashboard/practice",
+    // type: "instructor",
+    icon: "MdOutlineChecklistRtl",
+  },
+  {
+    id: 4,
+    name: "Compete",
+    path: "/dashboard/compete",
+    // type: "instructor",
+    icon: "MdOutlineStars",
+  },
+  {
+    id: 5,
+    name: "Quiz",
+    path: "/dashboard/quiz",
+    // type: "student",
+    icon: "MdOutlineQuiz",
+  },
+  {
+    id: 6,
+    name: "Leaderboard",
+    path: "/dashboard/leaderboard",
+    // type: "student",
+    icon: "MdOutlineLeaderboard",
+  },
+  {
+    id: 7,
+    name: "Jobs",
+    path: "/dashboard/jobs",
+    // type: "student",
+    icon: "MdShoppingBag",
+  },
+];

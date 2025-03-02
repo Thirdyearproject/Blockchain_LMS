@@ -1,0 +1,7 @@
+const BASE_URL = process.env.VITE_APP_BASE_URL;
+
+export const cBASE_URL = BASE_URL;
+export const USER_SIGNUP_API = BASE_URL + "/api/v1/auth/signup";
+export const LOGIN_API = BASE_URL + "/api/v1/auth/login";
+
+export const GET_USER_DETAILS_API = BASE_URL + "/api/v1/user/me";
