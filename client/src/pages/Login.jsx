@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { LuEye, LuEyeOff } from "react-icons/lu";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { FcGoogle } from "react-icons/fc";
 import { UserLogin } from "../services/operations/authApi";
 import { setToken, setUser } from "../redux/Slices/authSlice";
 
@@ -24,7 +23,7 @@ function Login() {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const error = params.get("error");
-    const email = params.get("email");
+    const userName = params.get("userName");
     const token = params.get("token");
     const user = params.get("user");
 
@@ -52,14 +51,14 @@ function Login() {
           setAuthError(
             <div className="flex flex-col">
               <div>
-                This email ({email}) already exists with password login.
+                This userName ({userName}) already exists with password login.
               </div>
               <div className="mt-2 flex items-center gap-2">
                 <span>Please use your password to login or</span>
                 <button
                   onClick={() => {
-                    const emailInput = document.getElementById("email");
-                    if (emailInput) emailInput.value = email;
+                    const userNameInput = document.getElementById("userName");
+                    if (userNameInput) userNameInput.value = userName;
                   }}
                   className="text-blue-600 hover:underline font-medium"
                 >
@@ -74,9 +73,9 @@ function Login() {
             "Authentication failed. Please try again or use password login."
           );
           break;
-        case "email_exists":
+        case "userName_exists":
           setAuthError(
-            "This email is already registered. Please login with your existing account."
+            "This userName is already registered. Please login with your existing account."
           );
           break;
         default:
@@ -109,16 +108,9 @@ function Login() {
 
   return (
     <div className="flex h-screen">
-      <div className="lg:w-1/2 w-full flex items-center justify-center bg-[#f9fafa]">
+      <div className=" w-full flex items-center justify-center bg-[#f9fafa]">
         <div className="lg:w-[500px] w-[400px]">
           <div className="flex items-center gap-4">
-            <div className="w-32 h-12">
-              <img
-                src="/logo.png"
-                className="w-full h-full object-cover"
-                alt=""
-              />
-            </div>
             <div className="flex flex-col">
               <h1 className="text-4xl font-bold">LOGIN</h1>
               <p className="text-gray-600">Hello, welcome back!</p>
@@ -131,24 +123,20 @@ function Login() {
               className="flex flex-col gap-6 mt-6"
             >
               <div>
-                <label htmlFor="email" className="lable-class">
-                  Email
+                <label htmlFor="userName" className="lable-class">
+                  userName
                 </label>
                 <input
-                  type="email"
-                  name="email"
-                  id="email"
+                  type="userName"
+                  name="userName"
+                  id="userName"
                   className="input-class"
-                  {...register("email", {
-                    required: "Email is required",
-                    pattern: {
-                      value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                      message: "Invalid email address",
-                    },
+                  {...register("userName", {
+                    required: "userName is required",
                   })}
                 />
-                {errors.email && (
-                  <span className="error-style">{errors.email.message}</span>
+                {errors.userName && (
+                  <span className="error-style">{errors.userName.message}</span>
                 )}
               </div>
               <div>

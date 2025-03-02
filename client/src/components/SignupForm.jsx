@@ -2,11 +2,16 @@ import { React, useState } from "react";
 import { LuEye, LuEyeOff } from "react-icons/lu";
 import { useForm, Controller } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import { setSignupData, setSignup } from "../redux/Slices/authSlice";
-import { FcGoogle } from "react-icons/fc";
+import {
+  resetSignupData,
+  setSignupData,
+  setSignup,
+  setUser,
+} from "../redux/Slices/authSlice";
 import { useNavigate } from "react-router-dom";
+import { UserSignup } from "../services/operations/authApi";
 
-function SignupForm({ type, setType }) {
+function SignupForm() {
   const {
     handleSubmit,
     register,
@@ -28,19 +33,25 @@ function SignupForm({ type, setType }) {
     return true;
   };
 
-  const validateConfirmPassword = (value) => {
-    if (value !== password) return "Passwords do not match";
-    return true;
-  };
+  async function onSubmit(data) {
+    try {
+      const result = await UserSignup(data);
+      if (result) {
+        dispatch(setUser(result));
+        localStorage.setItem("lmsuser", JSON.stringify(result));
+        dispatch(resetSignupData(null));
 
-  function onSubmit(data) {
-    dispatch(setSignupData(data));
-    dispatch(setSignup(true));
+        dispatch(setSignupData(data));
+        dispatch(setSignup(true));
+        navigate("/");
+      } else {
+        console.error("Signup failed");
+      }
+    } catch (error) {
+      console.error("Error during signup", error);
+    }
     console.log(data);
   }
-  const handleGoogleSignUp = () => {
-    window.location.href = `/`;
-  };
   return (
     <div className="p-5  mt-10 w-full bg-white shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-2xl">
       <form
@@ -48,36 +59,20 @@ function SignupForm({ type, setType }) {
         className="flex flex-col gap-5 mt-6"
       >
         <div>
-          <label htmlFor="email" className="lable-class">
-            Email
+          <label htmlFor="userName" className="lable-class">
+            userName
           </label>
           <input
             type="text"
             autoComplete="off"
-            name="email"
-            id="email"
+            name="userName"
+            id="userName"
             className="input-class"
-            {...register("email", {
-              required: { value: true, message: "Email is required" },
+            {...register("userName", {
+              required: { value: true, message: "userName is required" },
               pattern: {
-                value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                message: "Invalid email address",
-              },
-              validate: {
-                notBlackListed: (fieldValue) => {
-                  if (type === "corporate") {
-                    const blacklistedDomains = [
-                      "gmail.com",
-                      "yahoo.com",
-                      "hotmail.com",
-                    ];
-                    const isBlacklisted = blacklistedDomains.some((domain) =>
-                      fieldValue.endsWith(domain)
-                    );
-                    return !isBlacklisted || "Only company emails are allowed";
-                  }
-                  return true; // No validation needed for non-corporate types
-                },
+                value: /^[a-zA-Z0-9._%+-]/,
+                message: "Invalid userName ",
               },
             })}
           />

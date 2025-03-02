@@ -1,4 +1,4 @@
-const BASE_URL = process.env.VITE_APP_BASE_URL;
+const BASE_URL = process.env.VITE_APP_BASE_URL || "http://localhost:5678";
 
 export const cBASE_URL = BASE_URL;
 export const USER_SIGNUP_API = BASE_URL + "/api/v1/auth/signup";
