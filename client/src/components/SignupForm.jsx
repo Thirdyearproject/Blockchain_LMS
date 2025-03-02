@@ -1,6 +1,6 @@
-import { React, useState } from "react";
+import { useState } from "react";
 import { LuEye, LuEyeOff } from "react-icons/lu";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   resetSignupData,
@@ -19,8 +19,12 @@ function SignupForm() {
   } = useForm();
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
+  const [accounts, setAccounts] = useState([
+    { account_name: "", privateKey: "" },
+  ]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const validatePassword = (value) => {
     if (value.length < 8) return "Password must be at least 8 characters";
     if (!/\d/.test(value)) return "Password must include at least one number";
@@ -33,9 +37,25 @@ function SignupForm() {
     return true;
   };
 
+  const handleAccountChange = (index, field, value) => {
+    const updatedAccounts = [...accounts];
+    updatedAccounts[index][field] = value;
+    setAccounts(updatedAccounts);
+  };
+
+  const handleAddAccount = () => {
+    setAccounts([...accounts, { account_name: "", privateKey: "" }]);
+  };
+
+  const handleRemoveAccount = (index) => {
+    const updatedAccounts = accounts.filter((_, i) => i !== index);
+    setAccounts(updatedAccounts);
+  };
+
   async function onSubmit(data) {
     try {
-      const result = await UserSignup(data);
+      const formData = { ...data, accounts };
+      const result = await UserSignup(formData);
       if (result) {
         dispatch(setUser(result));
         localStorage.setItem("lmsuser", JSON.stringify(result));
@@ -43,111 +63,167 @@ function SignupForm() {
 
         dispatch(setSignupData(data));
         dispatch(setSignup(true));
-        navigate("/");
+        navigate("/dashboard/my-dashboard");
       } else {
         console.error("Signup failed");
       }
     } catch (error) {
       console.error("Error during signup", error);
     }
-    console.log(data);
   }
+
   return (
-    <div className="p-5  mt-10 w-full bg-white shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] rounded-2xl">
+    <div className="p-5 mt-10 w-full bg-white shadow-md rounded-2xl">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col gap-5 mt-6"
       >
+        {/* Username Field */}
         <div>
-          <label htmlFor="userName" className="lable-class">
-            userName
+          <label htmlFor="userName" className="text-gray-700 font-semibold">
+            Username
           </label>
           <input
             type="text"
             autoComplete="off"
-            name="userName"
             id="userName"
-            className="input-class"
+            className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             {...register("userName", {
-              required: { value: true, message: "userName is required" },
+              required: { value: true, message: "Username is required" },
               pattern: {
-                value: /^[a-zA-Z0-9._%+-]/,
-                message: "Invalid userName ",
+                value: /^[a-zA-Z0-9._%+-]+$/,
+                message: "Invalid username",
               },
             })}
           />
-          {errors.email && (
-            <span className="error-style">{errors.email.message}</span>
+          {errors.userName && (
+            <span className="text-red-500">{errors.userName.message}</span>
           )}
         </div>
+
+        {/* Password Field */}
         <div className="relative">
-          <label htmlFor="password" className="lable-class">
+          <label htmlFor="password" className="text-gray-700 font-semibold">
             Password
           </label>
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
               autoComplete="off"
-              name="password"
               id="password"
-              className="input-class"
+              className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               {...register("password", {
-                required: "Password is Required",
+                required: "Password is required",
                 validate: validatePassword,
               })}
               onChange={(e) => setPassword(e.target.value)}
             />
             {showPassword ? (
               <LuEyeOff
-                className="absolute right-[3%] cursor-pointer top-[30%] text-gray-500"
+                className="absolute right-3 top-3 cursor-pointer text-gray-500"
                 onClick={() => setShowPassword(false)}
               />
             ) : (
               <LuEye
-                className="absolute right-[3%] cursor-pointer top-[30%] text-gray-500"
+                className="absolute right-3 top-3 cursor-pointer text-gray-500"
                 onClick={() => setShowPassword(true)}
               />
             )}
           </div>
           {errors.password && (
-            <span className="error-style">{errors.password.message}</span>
+            <span className="text-red-500">{errors.password.message}</span>
           )}
         </div>
 
-        <div className="relative">
-          <label htmlFor="confirmPassword" className="lable-class">
+        {/* Confirm Password Field */}
+        <div>
+          <label
+            htmlFor="confirmPassword"
+            className="text-gray-700 font-semibold"
+          >
             Confirm Password
           </label>
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              autoComplete="off"
-              name="confirmPassword"
-              id="confirmPassword"
-              className="input-class"
-              {...register("confirmPassword", {
-                required: "Please confirm your password",
-                validate: (value) =>
-                  value === password || "Passwords do not match",
-              })}
-            />
-          </div>
+          <input
+            type={showPassword ? "text" : "password"}
+            autoComplete="off"
+            id="confirmPassword"
+            className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            {...register("confirmPassword", {
+              required: "Please confirm your password",
+              validate: (value) =>
+                value === password || "Passwords do not match",
+            })}
+          />
           {errors.confirmPassword && (
-            <span className="error-style">
+            <span className="text-red-500">
               {errors.confirmPassword.message}
             </span>
           )}
         </div>
 
+        {/* Account Section */}
+        <h3 className="text-lg font-bold mt-4">Accounts</h3>
         <div className="space-y-4">
-          <button
-            onSubmit={handleSubmit(onSubmit)}
-            type="submit"
-            className="px-6 w-full py-3 rounded-xl mt-2 font-semibold text-white hover:scale-95 transition-all duration-400 ease-in-out bg-[#22a7f1] shadow-[0_3px_10px_rgb(0,0,0,0.2)]"
-          >
-            Create Account
-          </button>
+          {accounts.map((account, index) => (
+            <div
+              key={index}
+              className="p-4 bg-gray-100 rounded-lg shadow-sm flex flex-col gap-3"
+            >
+              <div>
+                <label className="text-gray-700 font-semibold">
+                  Account Name:
+                </label>
+                <input
+                  type="text"
+                  className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={account.account_name}
+                  onChange={(e) =>
+                    handleAccountChange(index, "account_name", e.target.value)
+                  }
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-gray-700 font-semibold">
+                  Private Key:
+                </label>
+                <input
+                  type="password"
+                  className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={account.privateKey}
+                  onChange={(e) =>
+                    handleAccountChange(index, "privateKey", e.target.value)
+                  }
+                  required
+                />
+              </div>
+              <button
+                type="button"
+                className="w-1/4 text-white bg-red-500 px-3 py-2 rounded-md hover:bg-red-600 transition"
+                onClick={() => handleRemoveAccount(index)}
+              >
+                Remove
+              </button>
+            </div>
+          ))}
         </div>
+
+        {/* Add Account Button */}
+        <button
+          type="button"
+          onClick={handleAddAccount}
+          className="w-1/4 text-white bg-green-500 px-4 py-2 rounded-md hover:bg-green-600 transition mt-3"
+        >
+          Add Account
+        </button>
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          className="w-full px-6 py-3 rounded-xl mt-2 font-semibold text-white bg-blue-500 hover:scale-95 transition-all duration-300"
+        >
+          Create Account
+        </button>
       </form>
     </div>
   );
