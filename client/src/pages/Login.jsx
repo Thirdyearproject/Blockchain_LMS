@@ -61,8 +61,9 @@ function Login() {
   async function onSubmit(data) {
     try {
       const result = await UserLogin(data);
+      console.log(result);
       if (result?.token && result?.user) {
-        localStorage.setItem("lmstoken", result.token);
+        localStorage.setItem("lmstoken", JSON.stringify(result.token));
         localStorage.setItem("lmsuser", JSON.stringify(result.user));
 
         dispatch(setToken(result.token));

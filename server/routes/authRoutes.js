@@ -4,6 +4,8 @@ const encryptPrivateKey = require("../utils/encript");
 const decryptPrivateKey = require("../utils/decript");
 const bcrypt = require("bcrypt");
 const { db } = require("../config/database");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 // Sign up route
 router.post("/signup", async (req, res) => {
@@ -32,7 +34,7 @@ router.post("/signup", async (req, res) => {
 
         const userId = this.lastID;
         const stmt = db.prepare(
-          "INSERT INTO user_accounts (user_id, account_name, encryptedPrivateKey) VALUES (?, ?, ?)"
+          "INSERT INTO user_accounts (user_id, account_name, encryptedPrivateKey, iv) VALUES (?, ?, ?, ?)"
         );
 
         (async () => {
@@ -46,12 +48,12 @@ router.post("/signup", async (req, res) => {
                 });
               }
 
-              const { encryptedData } = await encryptPrivateKey(
+              const { encryptedData, iv } = await encryptPrivateKey(
                 account.privateKey,
                 password
               );
 
-              stmt.run(userId, account.account_name, encryptedData);
+              stmt.run(userId, account.account_name, encryptedData, iv);
             }
             stmt.finalize();
 
@@ -99,20 +101,23 @@ router.post("/login", (req, res) => {
         }
 
         try {
-          // Include the account name and decrypted private key in the response
-          const decryptedAccounts = accounts.map((account) => ({
-            account_name: account.account_name,
-            privateKey: decryptPrivateKey(
+          const decryptedAccounts = accounts.map((account) => {
+            const privateKey = decryptPrivateKey(
               account.encryptedPrivateKey,
-              password
-            ), // Decrypt the private key
-          }));
+              password,
+              account.iv // Pass the IV stored in the database
+            );
+            return {
+              account_name: account.account_name,
+              privateKey: privateKey, // Decrypted private key
+            };
+          });
 
           const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
             expiresIn: "1h",
           });
           console.log(`User ${userName} logged in successfully`);
-          res.json({ token, accounts: decryptedAccounts }); // Send account name and private key
+          res.json({ token, user: decryptedAccounts });
         } catch (decryptionError) {
           console.error("Decryption error:", decryptionError);
           res.status(500).json({ error: "Decryption error" });

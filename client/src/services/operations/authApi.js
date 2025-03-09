@@ -38,23 +38,13 @@ export async function UserLogin(data1) {
     const response = await apiConnector("POST", LOGIN_API, data1);
     console.log("#11");
     console.log(response);
-    //const data = await response.json();
 
     if (!response?.data) {
       throw new Error("No data received from server");
     }
 
-    if (!response.data.success) {
-      if (
-        response.data.message === "Please use Google Sign-In for this account"
-      ) {
-        // Prompt user to use Google Sign-In
-        alert(
-          "This account uses Google Sign-In. Please use the Google Sign-In button."
-        );
-      } else {
-        throw new Error(response.data.message || "Login failed");
-      }
+    if (!response.data) {
+      throw new Error(response.data.message || "Login failed");
     } else {
       return response.data;
     }

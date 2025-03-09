@@ -1,13 +1,20 @@
-async function decryptPrivateKey(encryptedData, password) {
-  const [saltHex, ivHex, encrypted] = encryptedData.split("::");
-  const salt = Buffer.from(saltHex, "hex");
-  const iv = Buffer.from(ivHex, "hex");
-  const key = crypto.pbkdf2Sync(password, salt, 10000, 32, "sha256");
-  const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
+const crypto = require("crypto");
 
-  let decrypted = decipher.update(encrypted, "hex", "utf8");
-  decrypted += decipher.final("utf8");
-  return decrypted;
+function decryptPrivateKey(encryptedPrivateKey, password, iv) {
+  const algorithm = "aes-256-cbc";
+  const key = crypto
+    .createHash("sha256")
+    .update(password)
+    .digest("base64")
+    .substr(0, 32); // Ensure key is 32 bytes
+  const decipher = crypto.createDecipheriv(
+    algorithm,
+    key,
+    Buffer.from(iv, "hex")
+  );
+  let decryptedData = decipher.update(encryptedPrivateKey, "hex", "utf8");
+  decryptedData += decipher.final("utf8");
+  return decryptedData;
 }
 
 module.exports = decryptPrivateKey;
