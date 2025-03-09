@@ -56,6 +56,7 @@ function SignupForm() {
     try {
       const formData = { ...data, accounts };
       const result = await UserSignup(formData);
+      console.log(result);
       if (result) {
         dispatch(setUser(result));
         localStorage.setItem("lmsuser", JSON.stringify(result));

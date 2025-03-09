@@ -1,3 +1,5 @@
+const crypto = require("crypto");
+
 async function encryptPrivateKey(privateKey, password) {
   const salt = crypto.randomBytes(16);
   const key = crypto.pbkdf2Sync(password, salt, 10000, 32, "sha256");

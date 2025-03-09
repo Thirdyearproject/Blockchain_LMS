@@ -5,15 +5,14 @@ import axios from "axios";
 export async function UserSignup(data) {
   try {
     const response = await axios.post(USER_SIGNUP_API, data, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+      headers: { "Content-Type": "application/json" },
     });
-    if (!response?.data?.success) {
+
+    if (!response?.data?.id) {
       throw new Error(response?.data?.message || "Could Not Signup");
     }
     console.log(response.data);
-    return response?.data?.data;
+    return response?.data;
   } catch (err) {
     if (err.response) {
       // The request was made and the server responded with a status code
