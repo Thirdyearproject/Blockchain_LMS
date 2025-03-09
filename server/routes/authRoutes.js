@@ -5,6 +5,7 @@ const decryptPrivateKey = require("../utils/decript");
 const bcrypt = require("bcrypt");
 const { db } = require("../config/database");
 const jwt = require("jsonwebtoken");
+const ethers = require("ethers");
 require("dotenv").config();
 
 // Sign up route
@@ -143,6 +144,26 @@ router.get("/protected", (req, res) => {
     req.user = user;
     res.json({ message: `Hello, User ${user.id}! This is protected content.` });
   });
+});
+
+router.post("/wallet-login", async (req, res) => {
+  const { address, signature } = req.body;
+
+  try {
+    const message = `Sign this message to verify login: ${Date.now()}`;
+    const recoveredAddress = ethers.verifyMessage(message, signature);
+
+    if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
+      return res.status(401).json({ message: "Signature verification failed" });
+    }
+
+    const token = jwt.sign({ address }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+    return res.json({ token, user: { address } });
+  } catch (error) {
+    return res.status(500).json({ message: "Authentication error" });
+  }
 });
 
 module.exports = router;

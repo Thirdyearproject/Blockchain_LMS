@@ -1,10 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const cors = require("cors");
-const sqlite3 = require("sqlite3").verbose();
-const crypto = require("crypto");
 const { connectWithDB } = require("./config/database");
 const AppError = require("./utils/appError");
 

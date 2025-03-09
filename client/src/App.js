@@ -33,7 +33,8 @@ function App() {
           </PrivateRoute>
         }
       >
-        <Route index element={<Navigate to="my-dashboard" replace />} />
+        {/* <Route index element={<Navigate to="my-dashboard" replace />} />
+        <Route path="my-dashboard" element={<StudentDashboard />} /> */}
       </Route>
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>

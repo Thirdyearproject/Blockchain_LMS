@@ -64,7 +64,7 @@ function SignupForm() {
 
         dispatch(setSignupData(data));
         dispatch(setSignup(true));
-        navigate("/dashboard/my-dashboard");
+        navigate("/dashboard");
       } else {
         console.error("Signup failed");
       }

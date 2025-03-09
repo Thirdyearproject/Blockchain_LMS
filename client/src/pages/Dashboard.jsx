@@ -12,63 +12,63 @@ function Dashboard() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem("lmstoken");
-        if (!token) {
-          throw new Error("No token found");
-        }
+  // useEffect(() => {
+  //   const fetchDashboardData = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const token = localStorage.getItem("lmstoken");
+  //       if (!token) {
+  //         throw new Error("No token found");
+  //       }
 
-        const response = await fetch(
-          `${process.env.VITE_APP_BASE_URL}/api/v1/user/dashboard`,
-          {
-            headers: {
-              Authorization: `Bearer ${JSON.parse(token)}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+  //       const response = await fetch(
+  //         `${process.env.VITE_APP_BASE_URL}/api/v1/user/dashboard`,
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${JSON.parse(token)}`,
+  //             "Content-Type": "application/json",
+  //           },
+  //         }
+  //       );
 
-        if (!response.ok) {
-          if (response.status === 401) {
-            // Token not provided
-            localStorage.removeItem("lmstoken");
-            localStorage.removeItem("lmsuser");
-            navigate("/");
-            return;
-          }
-          if (response.status === 403) {
-            // Token  is expired
-            localStorage.removeItem("lmstoken");
-            localStorage.removeItem("lmsuser");
-            navigate("/");
-            return;
-          }
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+  //       if (!response.ok) {
+  //         if (response.status === 401) {
+  //           // Token not provided
+  //           localStorage.removeItem("lmstoken");
+  //           localStorage.removeItem("lmsuser");
+  //           navigate("/");
+  //           return;
+  //         }
+  //         if (response.status === 403) {
+  //           // Token  is expired
+  //           localStorage.removeItem("lmstoken");
+  //           localStorage.removeItem("lmsuser");
+  //           navigate("/");
+  //           return;
+  //         }
+  //         throw new Error(`HTTP error! status: ${response.status}`);
+  //       }
 
-        const contentType = response.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-          throw new TypeError("Oops, we haven't got JSON!");
-        }
+  //       const contentType = response.headers.get("content-type");
+  //       if (!contentType || !contentType.includes("application/json")) {
+  //         throw new TypeError("Oops, we haven't got JSON!");
+  //       }
 
-        const data = await response.json();
-        setDashboardData(data);
-      } catch (err) {
-        console.error("Fetch error:", err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  //       const data = await response.json();
+  //       setDashboardData(data);
+  //     } catch (err) {
+  //       console.error("Fetch error:", err);
+  //       setError(err.message);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchDashboardData();
-  }, [navigate]);
+  //   fetchDashboardData();
+  // }, [navigate]);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  // if (loading) return <div>Loading...</div>;
+  // if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="relative h-fit">
@@ -79,13 +79,6 @@ function Dashboard() {
           isOpen ? "" : "items-center"
         } bg-white transition-all duration-300 ease-out`}
       >
-        <div className={`${isOpen ? "w-full" : "w-28"} h-12 `}>
-          <img
-            src="/logo.png"
-            className="w-full h-full object-cover"
-            alt="Logo"
-          />
-        </div>
         <div className="flex flex-col gap-4 mt-16">
           {sidebarLinks.map((link, index) => (
             <SidebarLink

@@ -71,30 +71,3 @@ export const WalletLogin = async (data) => {
     };
   }
 };
-// import express from "express";
-// import jwt from "jsonwebtoken";
-// import { ethers } from "ethers";
-
-// const router = express.Router();
-
-// router.post("/wallet-login", async (req, res) => {
-//   const { address, signature } = req.body;
-
-//   try {
-//     const message = `Sign this message to verify login: ${Date.now()}`;
-//     const recoveredAddress = ethers.verifyMessage(message, signature);
-
-//     if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
-//       return res.status(401).json({ message: "Signature verification failed" });
-//     }
-
-//     const token = jwt.sign({ address }, process.env.JWT_SECRET, {
-//       expiresIn: "7d",
-//     });
-//     return res.json({ token, user: { address } });
-//   } catch (error) {
-//     return res.status(500).json({ message: "Authentication error" });
-//   }
-// });
-
-// export default router;

@@ -48,7 +48,7 @@ function Login() {
         dispatch(setToken(result.token));
         dispatch(setUser(result.user));
 
-        navigate("/dashboard/my-dashboard");
+        navigate("/dashboard");
       } else {
         setAuthError("Wallet authentication failed.");
       }
@@ -69,7 +69,7 @@ function Login() {
         dispatch(setToken(result.token));
         dispatch(setUser(result.user));
 
-        navigate("/dashboard/my-dashboard");
+        navigate("/dashboard");
       } else {
         setAuthError("Invalid username or password.");
       }
