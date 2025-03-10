@@ -34,12 +34,13 @@ function Login() {
       const address = await signer.getAddress();
       setWalletAddress(address);
 
-      // Sign a message to verify ownership
-      const message = `Sign this message to verify login: ${Date.now()}`;
+      // Generate a timestamp for the message
+      const timestamp = Date.now();
+      const message = `Sign this message to verify login: ${timestamp}`;
+
       const signature = await signer.signMessage(message);
 
-      // Send to backend for authentication
-      const result = await WalletLogin({ address, signature });
+      const result = await WalletLogin({ address, signature, timestamp });
 
       if (result?.token && result?.user) {
         localStorage.setItem("lmstoken", result.token);
