@@ -5,7 +5,7 @@ import { LuEye, LuEyeOff } from "react-icons/lu";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { UserLogin, WalletLogin } from "../services/operations/authApi";
-import { setToken, setUser } from "../redux/Slices/authSlice";
+import { setToken, setUser, setType } from "../redux/Slices/authSlice";
 
 function Login() {
   const dispatch = useDispatch();
@@ -66,9 +66,11 @@ function Login() {
       if (result?.token && result?.user) {
         localStorage.setItem("lmstoken", JSON.stringify(result.token));
         localStorage.setItem("lmsuser", JSON.stringify(result.user));
+        localStorage.setItem("type", JSON.stringify(result.type));
 
         dispatch(setToken(result.token));
         dispatch(setUser(result.user));
+        dispatch(setType(result.type));
 
         navigate("/dashboard");
       } else {

@@ -12,17 +12,17 @@ require("dotenv").config();
 // Sign up route
 router.post("/signup", async (req, res) => {
   console.log("Received signup request:", req.body);
-  const { userName, password, accounts } = req.body;
+  const { userName, password, accounts, accountType } = req.body;
 
-  if (!userName || !password || !accounts || !accounts.length) {
+  if (!userName || !password || !accounts || !accounts.length || !accountType) {
     return res.status(400).json({ error: "All fields are required" });
   }
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     db.run(
-      "INSERT INTO users (userName, password) VALUES (?, ?)",
-      [userName, hashedPassword],
+      "INSERT INTO users (userName, password,accountType) VALUES (?, ?,?)",
+      [userName, hashedPassword, accountType],
       function (err) {
         if (err) {
           if (err.code === "SQLITE_CONSTRAINT") {
@@ -119,7 +119,7 @@ router.post("/login", (req, res) => {
             expiresIn: "1h",
           });
           console.log(`User ${userName} logged in successfully`);
-          res.json({ token, user: decryptedAccounts });
+          res.json({ token, user: decryptedAccounts, type: user.accountType });
         } catch (decryptionError) {
           console.error("Decryption error:", decryptionError);
           res.status(500).json({ error: "Decryption error" });

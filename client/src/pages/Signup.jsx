@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 function Signup() {
   const navigate = useNavigate();
   const { signup } = useSelector((state) => state.auth);
-  const [type, setType] = useState("candidate");
+  const [type, setType] = useState("Student");
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
 

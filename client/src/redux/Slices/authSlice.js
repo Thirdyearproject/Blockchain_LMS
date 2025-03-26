@@ -7,6 +7,9 @@ const initialState = {
   user: localStorage.getItem("lmsuser")
     ? JSON.parse(localStorage.getItem("lmsuser"))
     : null,
+  type: localStorage.getItem("type")
+    ? JSON.parse(localStorage.getItem("type"))
+    : null,
   signupData: null,
   signup: false,
 };
@@ -23,6 +26,10 @@ const authSlice = createSlice({
       state.user = action.payload;
       localStorage.setItem("user", JSON.stringify(action.payload));
     },
+    setType(state, action) {
+      state.user = action.payload;
+      localStorage.setItem("type", JSON.stringify(action.payload));
+    },
     resetSignupData(state, action) {
       state.signupData = action.payload;
     },
@@ -35,6 +42,12 @@ const authSlice = createSlice({
   },
 });
 
-export const { setSignupData, setSignup, resetSignupData, setToken, setUser } =
-  authSlice.actions;
+export const {
+  setSignupData,
+  setSignup,
+  resetSignupData,
+  setToken,
+  setUser,
+  setType,
+} = authSlice.actions;
 export default authSlice.reducer;

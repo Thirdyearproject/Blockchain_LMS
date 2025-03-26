@@ -11,7 +11,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { UserSignup } from "../services/operations/authApi";
 
-function SignupForm() {
+function SignupForm({ type, setType }) {
   const {
     handleSubmit,
     register,
@@ -75,10 +75,68 @@ function SignupForm() {
 
   return (
     <div className="p-5 mt-10 w-full bg-white shadow-md rounded-2xl">
+      <div className="bg-[#f1f3f4] py-1 px-1.5 rounded-md">
+        <button
+          onClick={() => setType("Student")}
+          className={`w-1/2 ${
+            type === "Student"
+              ? "text-black bg-white"
+              : "bg-transparent text-gray-500"
+          } transition-all duration-200 text-sm ease-in-out rounded-sm font-semibold`}
+        >
+          Student
+        </button>
+        <button
+          onClick={() => setType("Teacher")}
+          className={`w-1/2 ${
+            type === "Teacher"
+              ? "text-black bg-white"
+              : "bg-transparent text-gray-500"
+          } transition-all duration-200 text-sm ease-in-out rounded-sm font-semibold`}
+        >
+          Teacher
+        </button>
+      </div>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col gap-5 mt-6"
       >
+        <div className="">
+          <label htmlFor="accountType" className="lable-class">
+            ACCOUNT TYPE{" "}
+          </label>
+          {type === "Student" && (
+            <div className="flex gap-48 items-center">
+              <div className="flex gap-1 items-center my-2">
+                <input
+                  type="radio"
+                  {...register("accountType", { required: true })}
+                  name="accountType"
+                  id="student"
+                  value="student"
+                />
+                <label htmlFor="student">Student</label>
+              </div>
+            </div>
+          )}
+          {type === "Teacher" && (
+            <div className="flex gap-48 items-center">
+              <div className="flex gap-1 items-center my-2 ">
+                <input
+                  value="teacher"
+                  type="radio"
+                  {...register("accountType", { required: true })}
+                  name="accountType"
+                  id="teacher"
+                />
+                <label htmlFor="teacher">teacher</label>
+              </div>
+            </div>
+          )}
+          {errors.accountType && (
+            <span className="error-style">Account Type is Required</span>
+          )}
+        </div>
         {/* Username Field */}
         <div>
           <label htmlFor="userName" className="text-gray-700 font-semibold">
