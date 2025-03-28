@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { MdArrowForwardIos, MdArrowBackIos } from "react-icons/md";
+import { MdArrowForwardIos } from "react-icons/md";
+import { MdArrowBackIos } from "react-icons/md";
 import { Outlet } from "react-router-dom";
 import { sidebarLinks } from "../data/dashboardLinks";
 import SidebarLink from "../components/Dashboard/SidebarLink";
-import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
   const [isOpen, setIsOpen] = useState(false);
-  const [dashboardData, setDashboardData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
   return (
     <div className="relative h-fit">
@@ -37,11 +33,12 @@ function Dashboard() {
             isOpen ? "right-[-9%]" : "right-[-22%]"
           } bg-[#dceafd] p-2 rounded-full`}
         >
-          {isOpen ? <MdArrowBackIos className="pl-1" /> : <MdArrowForwardIos />}
+          {isOpen && <MdArrowBackIos className="pl-1" />}
+          {!isOpen && <MdArrowForwardIos />}
         </div>
       </div>
       <div className={`h-full flex transition-all duration-300 ml-[70px]`}>
-        {dashboardData && <Outlet context={dashboardData} />}
+        <Outlet />
       </div>
     </div>
   );

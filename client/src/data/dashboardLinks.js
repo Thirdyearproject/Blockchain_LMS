@@ -2,7 +2,7 @@ export const sidebarLinks = [
   {
     id: 1,
     name: "Dashboard",
-    path: "/dashboard",
+    path: "/dashboard/my-dashboard",
     icon: "MdOutlineDashboard",
   },
   {

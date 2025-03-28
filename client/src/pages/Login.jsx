@@ -49,7 +49,7 @@ function Login() {
         dispatch(setToken(result.token));
         dispatch(setUser(result.user));
 
-        navigate("/dashboard");
+        navigate("/dashboard/my-dashboard");
       } else {
         setAuthError("Wallet authentication failed.");
       }

@@ -5,7 +5,10 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import OpenRoute from "./components/Auth/OpenRoute";
 import PrivateRoute from "./components/Auth/PrivateRoute";
+import StudentDashboard from "./components/StudentDashboard/StudentDashboard";
+import { useSelector } from "react-redux";
 function App() {
+  const { type } = useSelector((state) => state.auth);
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
@@ -33,8 +36,15 @@ function App() {
           </PrivateRoute>
         }
       >
-        {/* <Route index element={<Navigate to="my-dashboard" replace />} />
-        <Route path="my-dashboard" element={<StudentDashboard />} /> */}
+        <Route
+          path="my-dashboard"
+          index
+          element={
+            // <PrivateRoute>
+            <StudentDashboard />
+            // </PrivateRoute>
+          }
+        ></Route>
       </Route>
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
