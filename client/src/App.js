@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import React from "react";
 import { Route, Routes, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -7,8 +7,10 @@ import OpenRoute from "./components/Auth/OpenRoute";
 import PrivateRoute from "./components/Auth/PrivateRoute";
 import StudentDashboard from "./components/StudentDashboard/StudentDashboard";
 import { useSelector } from "react-redux";
+
 function App() {
   const { type } = useSelector((state) => state.auth);
+
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
@@ -36,15 +38,9 @@ function App() {
           </PrivateRoute>
         }
       >
-        <Route
-          path="my-dashboard"
-          index
-          element={
-            // <PrivateRoute>
-            <StudentDashboard />
-            // </PrivateRoute>
-          }
-        ></Route>
+        {type === "student" && (
+          <Route path="my-dashboard" index element={<StudentDashboard />} />
+        )}
       </Route>
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>

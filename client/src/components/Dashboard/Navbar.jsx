@@ -15,7 +15,6 @@ const Navbar = ({ name }) => {
   const navigate = useNavigate();
 
   function handlelogout() {
-    window.location.href = "http://localhost:5678/auth/logout";
     localStorage.removeItem("lmstoken");
     localStorage.removeItem("lmsuser");
     dispatch(setToken(null));
