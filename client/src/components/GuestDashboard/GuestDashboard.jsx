@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { ethers } from "ethers";
 import Navbar from "../Dashboard/Navbar";
-import FileUpload from "../FileUpload";
 import Display from "../Display";
 import Modal from "../Modal";
 import { setUser } from "../../redux/Slices/authSlice";
@@ -170,12 +169,6 @@ function StudentDashboard() {
     if (selectedAccount && (account || contract)) {
       return (
         <div>
-          <FileUpload
-            account={account}
-            provider={provider}
-            contract={contract}
-          />
-
           <hr className="black-line" />
 
           <Display

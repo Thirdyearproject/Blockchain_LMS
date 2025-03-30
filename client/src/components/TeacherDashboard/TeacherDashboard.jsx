@@ -170,6 +170,14 @@ function StudentDashboard() {
     if (selectedAccount && (account || contract)) {
       return (
         <div>
+          <button className="share" onClick={() => setModalOpen(true)}>
+            Share
+          </button>
+
+          {modalOpen && (
+            <Modal setModalOpen={setModalOpen} contract={contract} />
+          )}
+
           <FileUpload
             account={account}
             provider={provider}
