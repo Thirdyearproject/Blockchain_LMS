@@ -186,12 +186,12 @@ function StudentDashboard() {
 
           <hr className="black-line" />
 
-          {/* <Display
+          <Display
             contract={contract}
             account={account}
             provider={provider}
             selectedAccount={selectedAccount}
-          /> */}
+          />
         </div>
       );
     }

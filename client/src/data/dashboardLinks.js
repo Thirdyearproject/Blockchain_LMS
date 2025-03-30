@@ -1,24 +1,25 @@
 export const sidebarLinks = [
+  // {
+  //   id: 1,
+  //   name: "Dashboard",
+  //   path: "/dashboard/my-dashboard",
+  //   icon: "MdOutlineDashboard",
+  // },
   {
     id: 1,
-    name: "Dashboard",
-    path: "/dashboard/my-dashboard",
-    icon: "MdOutlineDashboard",
-  },
-  {
-    id: 2,
     name: "Books",
-    path: "/dashboard/Books",
+    path: "/dashboard/my-dashboard",
+    // path: "/dashboard/Books",
     icon: "MdMenuBook",
   },
   {
-    id: 3,
+    id: 2,
     name: "Favourite",
     path: "/dashboard/Favourite",
     icon: "MdOutlineStars",
   },
   {
-    id: 4,
+    id: 3,
     name: "New",
     path: "/dashboard/new",
     icon: "MdShoppingBag",
