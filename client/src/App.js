@@ -41,6 +41,15 @@ function App() {
         {type === "student" && (
           <Route path="my-dashboard" index element={<StudentDashboard />} />
         )}
+        {type === "teacher" && (
+          <Route path="my-dashboard" index element={<StudentDashboard />} />
+        )}
+        {type === "guest" && (
+          <Route path="my-dashboard" index element={<StudentDashboard />} />
+        )}
+        {type === "admin" && (
+          <Route path="my-dashboard" index element={<StudentDashboard />} />
+        )}
       </Route>
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
