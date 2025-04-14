@@ -1,15 +1,19 @@
-const hre = require("hardhat");
-
 async function main() {
-  const Upload = await hre.ethers.getContractFactory("upload");
-  const upload = await Upload.deploy();
+  const [deployer] = await ethers.getSigners();
 
-  await upload.deployed();
+  console.log("Deploying contracts with account:", deployer.address);
 
-  console.log("Library deployed to:", upload.address);
+  const ELibrary = await ethers.getContractFactory("ELibraryBorrowing");
+  const library = await ELibrary.deploy();
+
+  await library.deployed();
+
+  console.log("ELibrary deployed to:", library.address);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+      console.error(error);
+      process.exit(1);
+  });
