@@ -1,1 +1,5 @@
 server/mydb.sqlite
+node_modules
+.env
+cache
+artifacts
