@@ -43,11 +43,12 @@ function Login() {
       const result = await WalletLogin({ address, signature, timestamp });
 
       if (result?.token && result?.user) {
-        localStorage.setItem("lmstoken", result.token);
+        localStorage.setItem("lmstoken", JSON.stringify(result.token));
         localStorage.setItem("lmsuser", JSON.stringify(result.user));
-
+        localStorage.setItem("lmsuser", JSON.stringify("guest"));
         dispatch(setToken(result.token));
         dispatch(setUser(result.user));
+        dispatch(setType("guest"));
 
         navigate("/dashboard/my-dashboard");
       } else {

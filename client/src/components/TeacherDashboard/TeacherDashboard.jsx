@@ -8,6 +8,7 @@ import Modal from "../Modal";
 import { setUser } from "../../redux/Slices/authSlice";
 import { WalletLogin } from "../../services/operations/authApi";
 import Upload from "../../artifacts/contracts/Upload.sol/upload.json";
+import { initializeWallet } from "../../services/Functions/initializeWallet";
 
 function TeacherDashboard() {
   const { user, type } = useSelector((state) => state.auth);
@@ -20,15 +21,6 @@ function TeacherDashboard() {
   const [errorMessage, setErrorMessage] = useState("");
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-
-  const initializeWallet = async (privateKey) => {
-    const provider = new ethers.JsonRpcProvider(process.env.REACT_APP_RPC_URL);
-    const wallet = new ethers.Wallet(privateKey, provider);
-    const contractAddress = "0x5fbdb2315678afecb367f032d93f642f64180aa3";
-    const contract = new ethers.Contract(contractAddress, Upload.abi, wallet);
-    const address = await wallet.getAddress();
-    return { contract, address };
-  };
 
   const handleAccountSelect = async (acc) => {
     try {

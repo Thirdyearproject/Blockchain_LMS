@@ -7,7 +7,7 @@ import Display from "../Display";
 import { setUser } from "../../redux/Slices/authSlice";
 import { WalletLogin } from "../../services/operations/authApi";
 import Upload from "../../artifacts/contracts/Upload.sol/upload.json";
-import { toast } from "react-toastify";
+import { initializeWallet } from "../../services/Functions/initializeWallet";
 
 function StudentDashboard() {
   const { user, type } = useSelector((state) => state.auth);
@@ -26,7 +26,7 @@ function StudentDashboard() {
   const initializeWallet = async (privateKey) => {
     const provider = new ethers.JsonRpcProvider(process.env.REACT_APP_RPC_URL);
     const wallet = new ethers.Wallet(privateKey, provider);
-    const contractAddress = "0x5fbdb2315678afecb367f032d93f642f64180aa3"; //ELibrary deployed address
+    const contractAddress = contractAddress;
     const contract = new ethers.Contract(contractAddress, Upload.abi, wallet);
     const address = await wallet.getAddress();
     return { contract, address };
