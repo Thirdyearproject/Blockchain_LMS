@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ethers } from "ethers";
+import { formatEther } from "ethers";
 import "./Display.css";
 
 const Display = ({ contract, account, provider, selectedAccount }) => {
@@ -13,7 +13,7 @@ const Display = ({ contract, account, provider, selectedAccount }) => {
       if (account && provider) {
         try {
           const balance = await provider.getBalance(account);
-          setBalance(ethers.utils.formatEther(balance));
+          setBalance(formatEther(balance));
         } catch (error) {
           console.error("Error fetching balance:", error);
         }
