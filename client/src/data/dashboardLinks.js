@@ -12,16 +12,16 @@ export const sidebarLinks = [
     // path: "/dashboard/Books",
     icon: "MdMenuBook",
   },
-  {
-    id: 2,
-    name: "Favourite",
-    path: "/dashboard/Favourite",
-    icon: "MdOutlineStars",
-  },
-  {
-    id: 3,
-    name: "New",
-    path: "/dashboard/new",
-    icon: "MdShoppingBag",
-  },
+  // {
+  //   id: 2,
+  //   name: "Favourite",
+  //   path: "/dashboard/Favourite",
+  //   icon: "MdOutlineStars",
+  // },
+  // {
+  //   id: 3,
+  //   name: "New",
+  //   path: "/dashboard/new",
+  //   icon: "MdShoppingBag",
+  // },
 ];

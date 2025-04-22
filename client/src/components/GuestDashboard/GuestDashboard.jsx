@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import Navbar from "../Dashboard/Navbar";
-import Display from "../Display";
-import Upload from "../../artifacts/contracts/Upload.sol/upload.json";
+import DisplayBooks from "../DisplayBooks";
+import ELibrary from "../../artifacts/contracts/ELibrary.sol/ELibrary.json";
+import { CONTRACT_ADDRESS } from "../../services/apis";
 function GuestDashboard() {
   const [account, setAccount] = useState("");
   const [contract, setContract] = useState(null);
@@ -14,10 +15,9 @@ function GuestDashboard() {
         const provider = new ethers.JsonRpcProvider(
           process.env.REACT_APP_RPC_URL
         );
-        const contractAddress = contractAddress;
         const contract = new ethers.Contract(
-          contractAddress,
-          Upload.abi,
+          CONTRACT_ADDRESS,
+          ELibrary.abi,
           provider
         );
 
@@ -36,15 +36,13 @@ function GuestDashboard() {
       <Navbar name="Guest Dashboard" />
 
       <div className="w-full flex flex-col gap-6 mx-auto">
-        {contract ? (
-          <Display
+        {contract && (
+          <DisplayBooks
             contract={contract}
-            account={account} // empty string is fine for guest
+            account={account}
             provider={provider}
             selectedAccount={{ account_name: "Guest" }}
           />
-        ) : (
-          <p>Loading...</p>
         )}
       </div>
     </div>
