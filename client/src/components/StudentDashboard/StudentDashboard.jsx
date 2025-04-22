@@ -2,18 +2,16 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { ethers } from "ethers";
 import Navbar from "../Dashboard/Navbar";
-import FileUpload from "../FileUpload";
-import Display from "../Display";
+import BookUpload from "../BookUpload";
+import Books from "../Books";
 import { setUser } from "../../redux/Slices/authSlice";
 import { WalletLogin } from "../../services/operations/authApi";
-import Upload from "../../artifacts/contracts/Upload.sol/upload.json";
 import { initializeWallet } from "../../services/Functions/initializeWallet";
 
 function StudentDashboard() {
   const { user, type } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
-  // Parse accounts from user data
   const accounts = user && user.length > 0 ? user : [];
 
   const [account, setAccount] = useState("");
@@ -22,17 +20,6 @@ function StudentDashboard() {
   const [errorMessage, setErrorMessage] = useState("");
   const [selectedAccount, setSelectedAccount] = useState(null);
 
-  // Function to initialize wallet with private key
-  const initializeWallet = async (privateKey) => {
-    const provider = new ethers.JsonRpcProvider(process.env.REACT_APP_RPC_URL);
-    const wallet = new ethers.Wallet(privateKey, provider);
-    const contractAddress = contractAddress;
-    const contract = new ethers.Contract(contractAddress, Upload.abi, wallet);
-    const address = await wallet.getAddress();
-    return { contract, address };
-  };
-
-  // Handle account selection from Redux store
   const handleAccountSelect = async (acc) => {
     try {
       setErrorMessage("");
@@ -52,7 +39,6 @@ function StudentDashboard() {
     }
   };
 
-  // Connect with MetaMask
   const connectWithMetaMask = async () => {
     if (!window.ethereum) {
       alert("MetaMask is not installed. Please install it to continue.");
@@ -66,7 +52,6 @@ function StudentDashboard() {
       const signer = await provider.getSigner();
       const address = await signer.getAddress();
 
-      // Generate a timestamp for the message
       const timestamp = Date.now();
       const message = `Sign this message to verify login: ${timestamp}`;
 
@@ -77,7 +62,6 @@ function StudentDashboard() {
       if (result?.token && result?.user) {
         dispatch(setUser(result.user));
 
-        // Set the account details
         setAccount(address);
         setProvider(provider);
         setContract(null);
@@ -91,7 +75,6 @@ function StudentDashboard() {
     }
   };
 
-  // Auto-select account on component mount if only one account
   useEffect(() => {
     const autoSelectAccount = async () => {
       try {
@@ -106,7 +89,6 @@ function StudentDashboard() {
     autoSelectAccount();
   }, [accounts]);
 
-  // Render error message
   const renderErrorMessage = () => {
     if (errorMessage) {
       return (
@@ -119,7 +101,6 @@ function StudentDashboard() {
     return null;
   };
 
-  // Render account selection
   const renderAccountSelection = () => {
     if (!selectedAccount) {
       return (
@@ -186,12 +167,33 @@ function StudentDashboard() {
     return null;
   };
 
-  // Render main dashboard content
+  const borrowBook = async (bookId) => {
+    try {
+      const transaction = await contract.borrowBook(bookId);
+      await transaction.wait();
+      alert("Book borrowed successfully!");
+    } catch (error) {
+      console.error("Error borrowing book:", error);
+      alert("Failed to borrow book.");
+    }
+  };
+
+  const returnBook = async (bookId) => {
+    try {
+      const transaction = await contract.returnBook(bookId);
+      await transaction.wait();
+      alert("Book returned successfully!");
+    } catch (error) {
+      console.error("Error returning book:", error);
+      alert("Failed to return book.");
+    }
+  };
+
   const renderDashboardContent = () => {
     if (selectedAccount && (account || contract)) {
       return (
         <div>
-          <FileUpload
+          <BookUpload
             account={account}
             provider={provider}
             contract={contract}
@@ -199,11 +201,11 @@ function StudentDashboard() {
 
           <hr className="black-line" />
 
-          <Display
+          <Books
             contract={contract}
             account={account}
-            provider={provider}
-            selectedAccount={selectedAccount}
+            borrowBook={borrowBook}
+            returnBook={returnBook}
           />
         </div>
       );
@@ -220,7 +222,6 @@ function StudentDashboard() {
       {renderErrorMessage()}
 
       <div className="w-full flex lg:flex-nowrap flex-wrap gap-6 mx-auto h-fit">
-        {/* Account display */}
         <div className="header">
           {account && <p style={{ color: "black" }}>Account: {account}</p>}
           <hr className="black-line" />

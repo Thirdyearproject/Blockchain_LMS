@@ -3,7 +3,7 @@ import Upload from "../../artifacts/contracts/Upload.sol/upload.json";
 import { CONTRACT_ADDRESS } from "../apis";
 
 export const initializeWallet = async (privateKey) => {
-  const provider = new ethers.JsonRpcProvider(import.meta.env.VITE_APP_RPC_URL);
+  const provider = new ethers.JsonRpcProvider();
   const wallet = new ethers.Wallet(privateKey, provider);
   const contract = new ethers.Contract(CONTRACT_ADDRESS, Upload.abi, wallet);
   const address = await wallet.getAddress();
