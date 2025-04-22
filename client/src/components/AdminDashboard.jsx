@@ -2,13 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { ethers } from "ethers";
 import Navbar from "../Dashboard/Navbar";
-import FileUpload from "../FileUpload";
-import Display from "../Display";
-import Modal from "../Modal";
+import BookUpload from "../BookUpload";
+import Books from "../Books";
+import RegisterUser from "./RegisterUser";
+import UpdateClearance from "./UpdateClearance";
+import ValidateBook from "./ValidateBook";
 import { setUser } from "../../redux/Slices/authSlice";
 import { WalletLogin } from "../../services/operations/authApi";
 
-function StudentDashboard() {
+function AdminDashboard() {
   const { user, token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
@@ -170,7 +172,7 @@ function StudentDashboard() {
     if (selectedAccount && (account || contract)) {
       return (
         <div>
-          <FileUpload
+          <BookUpload
             account={account}
             provider={provider}
             contract={contract}
@@ -178,12 +180,23 @@ function StudentDashboard() {
 
           <hr className="black-line" />
 
-          <Display
+          <Books
             contract={contract}
             account={account}
             provider={provider}
             selectedAccount={selectedAccount}
           />
+          <hr className="black-line" />
+
+          {selectedAccount && selectedAccount.isAdmin && (
+            <div>
+              <RegisterUser contract={contract} account={account} />
+              <UpdateClearance contract={contract} account={account} />
+            </div>
+          )}
+
+          {/* User functionalities */}
+          <ValidateBook contract={contract} account={account} />
         </div>
       );
     }
@@ -212,4 +225,4 @@ function StudentDashboard() {
   );
 }
 
-export default StudentDashboard;
+export default AdminDashboard;
