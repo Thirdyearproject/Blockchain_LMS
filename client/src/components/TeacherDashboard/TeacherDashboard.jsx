@@ -7,7 +7,6 @@ import Display from "../Display";
 import Modal from "../Modal";
 import { setUser } from "../../redux/Slices/authSlice";
 import { WalletLogin } from "../../services/operations/authApi";
-import Upload from "../../artifacts/contracts/Upload.sol/upload.json";
 import { initializeWallet } from "../../services/Functions/initializeWallet";
 
 function TeacherDashboard() {

@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import Upload from "../../artifacts/contracts/Upload.sol/upload.json";
+import Upload from "../../artifacts/contracts/ELibrary.sol/ELibrary.json";
 import { CONTRACT_ADDRESS } from "../apis";
 
 export const initializeWallet = async (privateKey) => {

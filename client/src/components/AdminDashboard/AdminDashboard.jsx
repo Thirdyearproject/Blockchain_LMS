@@ -4,9 +4,9 @@ import { ethers } from "ethers";
 import Navbar from "../Dashboard/Navbar";
 import BookUpload from "../BookUpload";
 import Books from "../Books";
-import RegisterUser from "./RegisterUser";
-import UpdateClearance from "./UpdateClearance";
-import ValidateBook from "./ValidateBook";
+import RegisterUser from "../RegisterUser";
+import UpdateClearance from "../UpdateClearance";
+import ValidateBook from "../ValidateBook";
 import { setUser } from "../../redux/Slices/authSlice";
 import { WalletLogin } from "../../services/operations/authApi";
 
