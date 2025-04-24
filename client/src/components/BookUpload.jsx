@@ -26,14 +26,20 @@ const BookUpload = ({ contract, account }) => {
           url: "https://api.pinata.cloud/pinning/pinFileToIPFS",
           data: formData,
           headers: {
-            pinata_api_key: `YOUR_PINATA_API_KEY`,
-            pinata_secret_api_key: `YOUR_PINATA_SECRET_API_KEY`,
+            pinata_api_key: `51bd33b7307e30887e87`,
+            pinata_secret_api_key: `cc803c7cac8712104fa091f7426ec97e4b2c2b955a585e636562dcc51b207cfd`,
             "Content-Type": "multipart/form-data",
           },
         });
 
         const ipfsHash = resFile.data.IpfsHash;
-        const bookId = id(title + author); // Use the id function directly
+
+        const ipfsURL = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
+        console.log("View file at:", ipfsURL);
+
+        const bookId = id(title + author);
+
+        console.log(contract);
 
         // Call the smart contract to add the uploaded book
         const transaction = await contract.addBook(
