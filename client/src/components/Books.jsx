@@ -1,4 +1,3 @@
-/* File: Books.jsx */
 import React, { useState, useEffect } from "react";
 
 const Books = ({ contract, account }) => {
@@ -64,72 +63,72 @@ const Books = ({ contract, account }) => {
   };
 
   return (
-    <div>
-      <h2>Available Books</h2>
-      {loading ? (
-        <p>Loading books...</p>
-      ) : (
-        <div>
-          {availableBooks.length > 0 ? (
-            availableBooks.map((book) => (
-              <div key={book.id} style={styles.bookItem}>
-                <p>{book.title}</p>
+    <div className="max-w-4xl mx-auto my-12 p-6 bg-gray-50 rounded-lg shadow-lg">
+      <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">
+        Library Book Management
+      </h1>
+
+      {/* Available Books Section */}
+      <section className="mb-12 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <h2 className="text-2xl font-semibold mb-6 text-blue-700 border-b border-blue-300 pb-2">
+          Available Books
+        </h2>
+
+        {loading ? (
+          <p className="text-gray-600">Loading books...</p>
+        ) : availableBooks.length > 0 ? (
+          <ul className="divide-y divide-gray-200">
+            {availableBooks.map((book) => (
+              <li
+                key={book.id}
+                className="flex justify-between items-center py-3"
+              >
+                <p className="text-gray-900 font-medium">{book.title}</p>
                 <button
                   onClick={() => borrowBook(book.id)}
-                  style={styles.button}
+                  className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-5 py-2 rounded-md font-semibold transition"
                 >
                   Borrow
                 </button>
-              </div>
-            ))
-          ) : (
-            <p>No available books.</p>
-          )}
-        </div>
-      )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-gray-500 italic">No available books.</p>
+        )}
+      </section>
 
-      <h2>Borrowed Books</h2>
-      {loading ? (
-        <p>Loading books...</p>
-      ) : (
-        <div>
-          {borrowedBooks.length > 0 ? (
-            borrowedBooks.map((book) => (
-              <div key={book.id} style={styles.bookItem}>
-                <p>{book.title}</p>
+      {/* Borrowed Books Section */}
+      <section className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <h2 className="text-2xl font-semibold mb-6 text-green-700 border-b border-green-300 pb-2">
+          Borrowed Books
+        </h2>
+
+        {loading ? (
+          <p className="text-gray-600">Loading books...</p>
+        ) : borrowedBooks.length > 0 ? (
+          <ul className="divide-y divide-gray-200">
+            {borrowedBooks.map((book) => (
+              <li
+                key={book.id}
+                className="flex justify-between items-center py-3"
+              >
+                <p className="text-gray-900 font-medium">{book.title}</p>
                 <button
                   onClick={() => returnBook(book.id)}
-                  style={styles.button}
+                  className="bg-green-600 hover:bg-green-700 active:bg-green-800 text-white px-5 py-2 rounded-md font-semibold transition"
                 >
                   Return
                 </button>
-              </div>
-            ))
-          ) : (
-            <p>No borrowed books.</p>
-          )}
-        </div>
-      )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-gray-500 italic">No borrowed books.</p>
+        )}
+      </section>
     </div>
   );
-};
-
-const styles = {
-  bookItem: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "10px",
-    borderBottom: "1px solid #ccc",
-  },
-  button: {
-    padding: "5px 10px",
-    backgroundColor: "#007bff",
-    color: "white",
-    border: "none",
-    borderRadius: "4px",
-    cursor: "pointer",
-  },
 };
 
 export default Books;

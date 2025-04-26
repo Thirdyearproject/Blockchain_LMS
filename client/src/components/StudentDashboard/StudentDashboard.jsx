@@ -221,15 +221,18 @@ function StudentDashboard() {
 
       {renderErrorMessage()}
 
-      <div className="w-full flex lg:flex-nowrap flex-wrap gap-6 mx-auto h-fit">
-        <div className="header">
-          {account && <p style={{ color: "black" }}>Account: {account}</p>}
-          <hr className="black-line" />
-        </div>
-
-        {renderAccountSelection()}
-        {renderDashboardContent()}
+      <div className="bg rounded-lg shadow-md p-4 max-w-full max-w-lg mx-0 mb-6">
+        {account && (
+          <p className="text-gray-800 font-semibold text-base text-left">
+            <span className="text-gray-500 font-normal mr-2">Account:</span>
+            {account}
+          </p>
+        )}
+        <hr className="mt-3 border-t border-gray-300" />
       </div>
+
+      {renderAccountSelection()}
+      {renderDashboardContent()}
     </div>
   );
 }
