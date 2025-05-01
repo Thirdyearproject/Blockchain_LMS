@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import Navbar from "../Dashboard/Navbar";
 import BookUpload from "../BookUpload";
 import Books from "../Books";
-import { initializeWallet } from "../../services/Functions/initializeWallet"; // Import the function
+import { initializeWallet } from "../../services/Functions/initializeWallet";
 
 function StudentDashboard() {
   const { user } = useSelector((state) => state.auth);
@@ -14,18 +14,15 @@ function StudentDashboard() {
   const [provider, setProvider] = useState(null);
   const [contract, setContract] = useState(null);
   const [account, setAccount] = useState(null);
+  const [privateKey, setPrivateKey] = useState(null);
 
-  const renderErrorMessage = () => {
-    if (errorMessage) {
-      return (
-        <div className="error-banner">
-          {errorMessage}
-          <button onClick={() => setErrorMessage("")}>✕</button>
-        </div>
-      );
-    }
-    return null;
-  };
+  const renderErrorMessage = () =>
+    errorMessage && (
+      <div className="error-banner">
+        {errorMessage}
+        <button onClick={() => setErrorMessage("")}>✕</button>
+      </div>
+    );
 
   const borrowBook = async (bookId) => {
     try {
@@ -61,6 +58,7 @@ function StudentDashboard() {
             account={account}
             provider={provider}
             contract={contract}
+            privateKey={privateKey}
           />
           <hr className="black-line" />
           <Books
@@ -77,16 +75,17 @@ function StudentDashboard() {
 
   const initializeWalletConnection = async () => {
     try {
-      const privateKey = prompt("Please enter your private key:");
-      if (!privateKey) {
+      const inputPrivateKey = prompt("Please enter your private key:");
+      if (!inputPrivateKey) {
         setErrorMessage("Private key is required.");
         return;
       }
+      setPrivateKey(inputPrivateKey);
 
-      // Initialize wallet and contract
       const { contract, address, provider } = await initializeWallet(
-        privateKey
+        inputPrivateKey
       );
+
       setSelectedAccount(address);
       setProvider(provider);
       setContract(contract);
