@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { ethers } from "ethers";
 import Navbar from "../Dashboard/Navbar";
-import FileUpload from "../FileUpload";
+// import FileUpload from "../FileUpload";
 import Modal from "../Modal";
 import { setUser } from "../../redux/Slices/authSlice";
 import { WalletLogin } from "../../services/operations/authApi";
@@ -186,11 +186,11 @@ function TeacherDashboard() {
             <Modal setModalOpen={setModalOpen} contract={contract} />
           )}
 
-          <FileUpload
+          {/* <FileUpload
             account={account}
             provider={provider}
             contract={contract}
-          />
+          /> */}
           <hr className="black-line" />
         </div>
       );
