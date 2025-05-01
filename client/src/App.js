@@ -41,18 +41,20 @@ function App() {
           </PrivateRoute>
         }
       >
-        {type === "student" && (
+        {type === "0" && (
           <Route path="my-dashboard" index element={<StudentDashboard />} />
         )}
-        {type === "teacher" && (
+        {type === "1" && (
           <Route path="my-dashboard" index element={<AdminDashboard />} />
         )}
         {type === "guest" && (
           <Route path="my-dashboard" index element={<GuestDashboard />} />
         )}
-        {/* {type === "admin" && (
+
+        {/* ADMIN */}
+        {type === 2 && (
           <Route path="my-dashboard" index element={<AdminDashboard />} />
-        )} */}
+        )}
       </Route>
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
