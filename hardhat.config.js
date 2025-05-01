@@ -1,3 +1,4 @@
+
 // Import Hardhat Toolbox (includes ethers, waffle, chai, etc.)
 require("@nomicfoundation/hardhat-toolbox");
 
@@ -15,5 +16,6 @@ module.exports = {
     tests: "./test",              // Test files location
     cache: "./cache",             // Cache location
     artifacts: "./artifacts",     // Compiled artifacts location
+
   },
 };

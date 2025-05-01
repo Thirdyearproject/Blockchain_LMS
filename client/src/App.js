@@ -8,7 +8,7 @@ import PrivateRoute from "./components/Auth/PrivateRoute";
 import StudentDashboard from "./components/StudentDashboard/StudentDashboard";
 import GuestDashboard from "./components/GuestDashboard/GuestDashboard";
 import TeacherDashboard from "./components/TeacherDashboard/TeacherDashboard";
-// import AdminDashboard from "./components/AdminDashboard";
+import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 import { useSelector } from "react-redux";
 
 function App() {
@@ -45,7 +45,7 @@ function App() {
           <Route path="my-dashboard" index element={<StudentDashboard />} />
         )}
         {type === "teacher" && (
-          <Route path="my-dashboard" index element={<TeacherDashboard />} />
+          <Route path="my-dashboard" index element={<AdminDashboard />} />
         )}
         {type === "guest" && (
           <Route path="my-dashboard" index element={<GuestDashboard />} />

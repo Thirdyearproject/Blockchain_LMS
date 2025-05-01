@@ -3,11 +3,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { ethers } from "ethers";
 import Navbar from "../Dashboard/Navbar";
 import FileUpload from "../FileUpload";
-import Display from "../Display";
 import Modal from "../Modal";
 import { setUser } from "../../redux/Slices/authSlice";
 import { WalletLogin } from "../../services/operations/authApi";
-import Upload from "../../artifacts/contracts/Upload.sol/upload.json";
 import { initializeWallet } from "../../services/Functions/initializeWallet";
 
 function TeacherDashboard() {
@@ -194,12 +192,6 @@ function TeacherDashboard() {
             contract={contract}
           />
           <hr className="black-line" />
-          <Display
-            contract={contract}
-            account={account}
-            provider={provider}
-            selectedAccount={selectedAccount}
-          />
         </div>
       );
     }
