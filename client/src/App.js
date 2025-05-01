@@ -41,12 +41,16 @@ function App() {
           </PrivateRoute>
         }
       >
-        {type === "0" && (
+        {/* STUDENTS  */}
+        {type === 0 && (
           <Route path="my-dashboard" index element={<StudentDashboard />} />
         )}
+
+        {/* Teacher */}
         {type === "1" && (
           <Route path="my-dashboard" index element={<AdminDashboard />} />
         )}
+
         {type === "guest" && (
           <Route path="my-dashboard" index element={<GuestDashboard />} />
         )}

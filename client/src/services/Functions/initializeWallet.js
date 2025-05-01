@@ -7,5 +7,5 @@ export const initializeWallet = async (privateKey) => {
   const wallet = new ethers.Wallet(privateKey, provider);
   const contract = new ethers.Contract(CONTRACT_ADDRESS, Upload.abi, wallet);
   const address = await wallet.getAddress();
-  return { contract, address };
+  return { contract, address, provider };
 };

@@ -1,93 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { ethers } from "ethers";
 import Navbar from "../Dashboard/Navbar";
 import BookUpload from "../BookUpload";
 import Books from "../Books";
-import { setUser } from "../../redux/Slices/authSlice";
-import { WalletLogin } from "../../services/operations/authApi";
-import { initializeWallet } from "../../services/Functions/initializeWallet";
+import { initializeWallet } from "../../services/Functions/initializeWallet"; // Import the function
 
 function StudentDashboard() {
-  const { user, type } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
-  const accounts = user && user.length > 0 ? user : [];
-
-  const [account, setAccount] = useState("");
-  const [contract, setContract] = useState(null);
-  const [provider, setProvider] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [selectedAccount, setSelectedAccount] = useState(null);
-
-  const handleAccountSelect = async (acc) => {
-    try {
-      setErrorMessage("");
-      console.log("Selecting account:", acc.account_name);
-
-      const { contract, address } = await initializeWallet(acc.privateKey);
-
-      setSelectedAccount(acc);
-
-      setAccount(address);
-      setContract(contract);
-
-      console.log("Account selected successfully");
-    } catch (error) {
-      console.error("Account selection error:", error);
-      setErrorMessage(error.message);
-    }
-  };
-
-  const connectWithMetaMask = async () => {
-    if (!window.ethereum) {
-      alert("MetaMask is not installed. Please install it to continue.");
-      return;
-    }
-
-    try {
-      setErrorMessage("");
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      const signer = await provider.getSigner();
-      const address = await signer.getAddress();
-
-      const timestamp = Date.now();
-      const message = `Sign this message to verify login: ${timestamp}`;
-
-      const signature = await signer.signMessage(message);
-
-      const result = await WalletLogin({ address, signature, timestamp });
-
-      if (result?.token && result?.user) {
-        dispatch(setUser(result.user));
-
-        setAccount(address);
-        setProvider(provider);
-        setContract(null);
-        setSelectedAccount({ account_name: "MetaMask Account" });
-      } else {
-        throw new Error("Wallet authentication failed.");
-      }
-    } catch (error) {
-      console.error("MetaMask connection error:", error);
-      setErrorMessage(error.message);
-    }
-  };
-
-  useEffect(() => {
-    const autoSelectAccount = async () => {
-      try {
-        if (accounts.length === 1) {
-          await handleAccountSelect(accounts[0]);
-        }
-      } catch (error) {
-        console.error("Auto account selection error:", error);
-      }
-    };
-
-    autoSelectAccount();
-  }, [accounts]);
+  const [provider, setProvider] = useState(null);
+  const [contract, setContract] = useState(null);
+  const [account, setAccount] = useState(null);
 
   const renderErrorMessage = () => {
     if (errorMessage) {
@@ -101,74 +27,10 @@ function StudentDashboard() {
     return null;
   };
 
-  const renderAccountSelection = () => {
-    if (!selectedAccount) {
-      return (
-        <div className="account-selection">
-          <h2>Select an Account</h2>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "12px",
-              marginTop: "20px",
-            }}
-          >
-            {accounts.map((acc, index) => (
-              <div
-                key={index}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  border: "1px solid #ccc",
-                  borderRadius: "8px",
-                  padding: "10px 15px",
-                  backgroundColor: "#f9f9f9",
-                }}
-              >
-                <span style={{ fontWeight: "500" }}>{acc.account_name}</span>
-                <button
-                  onClick={() => handleAccountSelect(acc)}
-                  style={{
-                    marginLeft: "10px",
-                    padding: "6px 12px",
-                    cursor: "pointer",
-                    backgroundColor: "#007bff",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                  }}
-                >
-                  Select
-                </button>
-              </div>
-            ))}
-
-            <button
-              onClick={connectWithMetaMask}
-              style={{
-                backgroundColor: "#f6851b",
-                color: "white",
-                padding: "12px",
-                borderRadius: "8px",
-                fontSize: "16px",
-                border: "none",
-                cursor: "pointer",
-                fontWeight: "bold",
-              }}
-            >
-              Connect with MetaMask
-            </button>
-          </div>
-        </div>
-      );
-    }
-    return null;
-  };
-
   const borrowBook = async (bookId) => {
     try {
+      if (!contract) throw new Error("Contract is not loaded");
+
       const transaction = await contract.borrowBook(bookId);
       await transaction.wait();
       alert("Book borrowed successfully!");
@@ -180,6 +42,8 @@ function StudentDashboard() {
 
   const returnBook = async (bookId) => {
     try {
+      if (!contract) throw new Error("Contract is not loaded");
+
       const transaction = await contract.returnBook(bookId);
       await transaction.wait();
       alert("Book returned successfully!");
@@ -190,7 +54,7 @@ function StudentDashboard() {
   };
 
   const renderDashboardContent = () => {
-    if (selectedAccount && (account || contract)) {
+    if (selectedAccount && account && contract) {
       return (
         <div>
           <BookUpload
@@ -198,9 +62,7 @@ function StudentDashboard() {
             provider={provider}
             contract={contract}
           />
-
           <hr className="black-line" />
-
           <Books
             contract={contract}
             account={account}
@@ -210,8 +72,36 @@ function StudentDashboard() {
         </div>
       );
     }
-    return null;
+    return <div>Please connect your wallet to access the dashboard.</div>;
   };
+
+  const initializeWalletConnection = async () => {
+    try {
+      const privateKey = prompt("Please enter your private key:");
+      if (!privateKey) {
+        setErrorMessage("Private key is required.");
+        return;
+      }
+
+      // Initialize wallet and contract
+      const { contract, address, provider } = await initializeWallet(
+        privateKey
+      );
+      setSelectedAccount(address);
+      setProvider(provider);
+      setContract(contract);
+      setAccount(address);
+    } catch (error) {
+      setErrorMessage("Failed to initialize wallet connection.");
+      console.error("Error initializing wallet:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (user?.clearanceLevel === 0) {
+      initializeWalletConnection();
+    }
+  }, [user]);
 
   return (
     <div className="flex flex-col bg-gray-100 w-full p-4">
@@ -231,7 +121,6 @@ function StudentDashboard() {
         <hr className="mt-3 border-t border-gray-300" />
       </div>
 
-      {renderAccountSelection()}
       {renderDashboardContent()}
     </div>
   );
