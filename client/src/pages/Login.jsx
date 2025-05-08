@@ -11,8 +11,6 @@ function Login() {
   const [walletAddress, setWalletAddress] = useState("");
   const [authError, setAuthError] = useState("");
 
-  console.log("Signup Data:", JSON.stringify(signupData, null, 2)); // Fixing log to check data
-
   const loginWithAddress = async (address) => {
     if (!address) {
       setAuthError("Wallet address is required.");
@@ -24,18 +22,16 @@ function Login() {
       return;
     }
 
-    const user = signupData.find(
-      (u) => u.address?.toLowerCase() === address.toLowerCase() // Matching the address field now
-    );
+    const user = signupData.find((u) => u.userAddr.address === address);
 
     if (user) {
       const dummyToken = "dummy-token"; // simple dummy token
       localStorage.setItem("lmstoken", JSON.stringify(dummyToken));
-      localStorage.setItem("lmsuser", JSON.stringify(user));
+      localStorage.setItem("lmsuser", JSON.stringify(user.userAddr.address));
       localStorage.setItem("type", JSON.stringify(user.clearanceLevel));
 
       dispatch(setToken(dummyToken));
-      dispatch(setUser(user));
+      dispatch(setUser(user.userAddr.address));
       dispatch(setType(user.clearanceLevel));
 
       navigate("/dashboard");

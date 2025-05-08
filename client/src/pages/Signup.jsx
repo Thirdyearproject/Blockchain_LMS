@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IoIosArrowBack } from "react-icons/io";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   setSignup,
   resetSignupData,
@@ -9,12 +9,10 @@ import {
 } from "../redux/Slices/authSlice";
 
 import { ethers } from "ethers";
-import ELibraryAccessABI from "../artifacts/contracts/ELibraryAccess.sol/ELibraryAccess.json";
+import UserManagerABI from "../contracts/UserManager.json";
 import { CONTRACT_ADDRESS } from "../services/apis";
 
-// Hardhat’s default mnemonic
-const HARDHAT_MNEMONIC =
-  "test test test test test test test test test test test junk";
+const GANACHE_RPC_URL = "http://127.0.0.1:8545";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -24,70 +22,53 @@ export default function Signup() {
   const handleRegisterAll = async () => {
     setIsLoading(true);
     try {
-      // Connect to local Hardhat node
-      const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545/");
+      const provider = new ethers.JsonRpcProvider(GANACHE_RPC_URL);
 
-      // Derive the admin wallet
-      const adminWallet = ethers.Wallet.fromPhrase(
-        HARDHAT_MNEMONIC,
-        `m/44'/60'/0'/0/0`
-      ).connect(provider);
+      const adminSigner = await provider.getSigner(0);
 
-      // Instantiate contract
       const contract = new ethers.Contract(
         CONTRACT_ADDRESS,
-        ELibraryAccessABI.abi,
-        adminWallet
+        UserManagerABI.abi,
+        adminSigner
       );
 
-      const accounts = await provider.listAccounts();
-      if (accounts.length < 5) {
-        console.warn(
-          "⚠️ Need at least 5 accounts: admin + teacher + 2 students"
-        );
-        setIsLoading(false);
-        return;
-      }
+      const addresses = await provider.listAccounts();
 
       let registeredAccounts = [];
-      let nonce = await provider.getTransactionCount(adminWallet.address); // Get the current nonce of the admin wallet
 
-      console.group("📝 registerUser()");
-      for (let i = 1; i <= 4; i++) {
-        const userSigner = accounts[i];
-        const userAddr = await userSigner.getAddress();
+      for (let i = 0; i < addresses.length; i++) {
+        const userAddr = addresses[i];
         let clearanceLevel;
 
-        if (i === 1) {
-          clearanceLevel = 2; // Admin
-        } else if (i === 2) {
-          clearanceLevel = 1; // Teacher
+        if (i === 0) {
+          clearanceLevel = 3; // Admin Level
+        } else if (i === 1 || i === 2 || i === 3) {
+          clearanceLevel = 2; // Teacher Level
+        } else if (i === 8 || i === 9) {
+          clearanceLevel = 0; //guest Level
         } else {
-          clearanceLevel = 0; // Students
+          clearanceLevel = 1; // Student Level
         }
 
-        const tx = await contract.registerUser(userAddr, clearanceLevel, {
-          nonce: nonce++, // Use the current nonce and increment it for the next transaction
-        });
+        const tx = await contract.setClearance(userAddr, clearanceLevel);
         await tx.wait();
+
         console.log(
-          ` [${i}] ${userAddr} registered (level=${
-            clearanceLevel === 2
-              ? "Admin"
-              : clearanceLevel === 1
-              ? "Teacher"
-              : "Student"
-          })`
+          `✅ ${userAddr} registered with Clearance Level ${
+            clearanceLevel === 3
+              ? "Level3"
+              : clearanceLevel === 2
+              ? "Level2"
+              : "Level1"
+          }`
         );
 
         registeredAccounts.push({
-          address: userAddr,
+          userAddr,
           clearanceLevel,
         });
       }
-      console.groupEnd();
 
-      // Save to Redux and LocalStorage
       dispatch(setSignup(true));
       dispatch(setRegisteredAccounts(registeredAccounts));
       localStorage.setItem(
@@ -95,7 +76,7 @@ export default function Signup() {
         JSON.stringify(registeredAccounts)
       );
 
-      alert("🎉 Admin, Teacher, and Students registered successfully!");
+      alert("🎉 Accounts registered successfully!");
     } catch (err) {
       console.error("❌ Error registering accounts:", err);
       alert("Error—see console for details");
@@ -108,7 +89,6 @@ export default function Signup() {
     <div className="flex bg-[#f9fafa] min-h-screen">
       <div className="w-full flex flex-col items-center justify-center">
         <div className="md:w-[60%] w-full p-4">
-          {/* Back to Login */}
           <div
             onClick={() => {
               navigate("/");
