@@ -24,12 +24,12 @@ contract BookManager {
     }
 
     function proposeBook(string memory _title, uint _requiredClearance) external {
-        require(uint(userManager.getClearance(msg.sender)) < 2, "Not enough clearance to propose books");
+        require(uint(userManager.getClearance(msg.sender)) > 2, "Not enough clearance to propose books");
         books.push(Book(_title, _requiredClearance, Status.Proposed, msg.sender, 0, 0));
     }
 
     function voteOnBook(uint _bookId, bool _approve) external {
-        require(uint(userManager.getClearance(msg.sender)) < 1, "Not enough clearance to vote");
+        require(uint(userManager.getClearance(msg.sender)) > 0, "Not enough clearance to vote");
         require(!voted[_bookId][msg.sender], "Already voted");
 
         Book storage book = books[_bookId];

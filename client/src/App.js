@@ -1,22 +1,41 @@
 import React from "react";
 import { Route, Routes, Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
+
 import OpenRoute from "./components/Auth/OpenRoute";
 import PrivateRoute from "./components/Auth/PrivateRoute";
+
 import StudentDashboard from "./components/StudentDashboard/StudentDashboard";
 import GuestDashboard from "./components/GuestDashboard/GuestDashboard";
 import TeacherDashboard from "./components/TeacherDashboard/TeacherDashboard";
 import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
-import { useSelector } from "react-redux";
 
 function App() {
   const { type } = useSelector((state) => state.auth);
 
+  const renderDashboard = () => {
+    switch (type) {
+      case 0:
+        return <GuestDashboard />;
+      case 1:
+        return <StudentDashboard />;
+      case 2:
+        return <TeacherDashboard />;
+      case 3:
+        return <AdminDashboard />;
+      default:
+        return <Navigate to="/login" replace />;
+    }
+  };
+
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
+
       <Route
         path="/login"
         element={
@@ -25,6 +44,7 @@ function App() {
           </OpenRoute>
         }
       />
+
       <Route
         path="/signup"
         element={
@@ -33,6 +53,7 @@ function App() {
           </OpenRoute>
         }
       />
+
       <Route
         path="/dashboard"
         element={
@@ -41,25 +62,9 @@ function App() {
           </PrivateRoute>
         }
       >
-        {/* STUDENTS  */}
-        {type === 0 && (
-          <Route path="my-dashboard" index element={<StudentDashboard />} />
-        )}
-
-        {/* Teacher */}
-        {type === "1" && (
-          <Route path="my-dashboard" index element={<AdminDashboard />} />
-        )}
-
-        {type === "guest" && (
-          <Route path="my-dashboard" index element={<GuestDashboard />} />
-        )}
-
-        {/* ADMIN */}
-        {type === 2 && (
-          <Route path="my-dashboard" index element={<AdminDashboard />} />
-        )}
+        <Route path="my-dashboard" index element={renderDashboard()} />
       </Route>
+
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );

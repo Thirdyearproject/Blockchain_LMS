@@ -9,10 +9,8 @@ import {
 } from "../redux/Slices/authSlice";
 
 import { ethers } from "ethers";
-import UserManagerABI from "../contracts/UserManager.json";
-import { CONTRACT_ADDRESS } from "../services/apis";
-
-const GANACHE_RPC_URL = "http://127.0.0.1:8545";
+import UserManagerABI from "../build/contracts/UserManager.json";
+import { RPC_URL } from "../services/apis";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -22,12 +20,20 @@ export default function Signup() {
   const handleRegisterAll = async () => {
     setIsLoading(true);
     try {
-      const provider = new ethers.JsonRpcProvider(GANACHE_RPC_URL);
+      const provider = new ethers.JsonRpcProvider(RPC_URL);
 
       const adminSigner = await provider.getSigner(0);
+      console.log(UserManagerABI.networks);
+      const networkId = Object.keys(UserManagerABI.networks)[0];
+
+      const networkData = UserManagerABI.networks[networkId];
+      if (!networkData || !networkData.address) {
+        console.error(`Contract not deployed on network ${networkId}`);
+        return;
+      }
 
       const contract = new ethers.Contract(
-        CONTRACT_ADDRESS,
+        networkData.address,
         UserManagerABI.abi,
         adminSigner
       );
