@@ -12173,12 +12173,8 @@
   "ast": {
     "absolutePath": "project:/contracts/BookManager.sol",
     "exportedSymbols": {
-      "BookManager": [
-        203
-      ],
-      "UserManager": [
-        519
-      ]
+      "BookManager": [203],
+      "UserManager": [519]
     },
     "id": 204,
     "license": "MIT",
@@ -12186,12 +12182,7 @@
     "nodes": [
       {
         "id": 1,
-        "literals": [
-          "solidity",
-          "^",
-          "0.8",
-          ".19"
-        ],
+        "literals": ["solidity", "^", "0.8", ".19"],
         "nodeType": "PragmaDirective",
         "src": "33:24:0"
       },
@@ -12215,9 +12206,7 @@
         "contractKind": "contract",
         "fullyImplemented": true,
         "id": 203,
-        "linearizedBaseContracts": [
-          203
-        ],
+        "linearizedBaseContracts": [203],
         "name": "BookManager",
         "nameLocation": "101:11:0",
         "nodeType": "ContractDefinition",
@@ -12332,9 +12321,7 @@
                   "pathNode": {
                     "id": 11,
                     "name": "Status",
-                    "nameLocations": [
-                      "251:6:0"
-                    ],
+                    "nameLocations": ["251:6:0"],
                     "nodeType": "IdentifierPath",
                     "referencedDeclaration": 6,
                     "src": "251:6:0"
@@ -12461,9 +12448,7 @@
                 "pathNode": {
                   "id": 21,
                   "name": "Book",
-                  "nameLocations": [
-                    "354:4:0"
-                  ],
+                  "nameLocations": ["354:4:0"],
                   "nodeType": "IdentifierPath",
                   "referencedDeclaration": 20,
                   "src": "354:4:0"
@@ -12507,9 +12492,7 @@
               "pathNode": {
                 "id": 25,
                 "name": "UserManager",
-                "nameLocations": [
-                  "380:11:0"
-                ],
+                "nameLocations": ["380:11:0"],
                 "nodeType": "IdentifierPath",
                 "referencedDeclaration": 519,
                 "src": "380:11:0"
@@ -12938,10 +12921,7 @@
                       "id": 52,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        4294967278,
-                        4294967278
-                      ],
+                      "overloadedDeclarations": [4294967278, 4294967278],
                       "referencedDeclaration": 4294967278,
                       "src": "713:7:0",
                       "typeDescriptions": {
@@ -13476,10 +13456,7 @@
                       "id": 89,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        4294967278,
-                        4294967278
-                      ],
+                      "overloadedDeclarations": [4294967278, 4294967278],
                       "referencedDeclaration": 4294967278,
                       "src": "984:7:0",
                       "typeDescriptions": {
@@ -13633,10 +13610,7 @@
                       "id": 103,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        4294967278,
-                        4294967278
-                      ],
+                      "overloadedDeclarations": [4294967278, 4294967278],
                       "referencedDeclaration": 4294967278,
                       "src": "1082:7:0",
                       "typeDescriptions": {
@@ -13665,9 +13639,7 @@
                   "src": "1082:53:0"
                 },
                 {
-                  "assignments": [
-                    116
-                  ],
+                  "assignments": [116],
                   "declarations": [
                     {
                       "constant": false,
@@ -13690,9 +13662,7 @@
                         "pathNode": {
                           "id": 114,
                           "name": "Book",
-                          "nameLocations": [
-                            "1148:4:0"
-                          ],
+                          "nameLocations": ["1148:4:0"],
                           "nodeType": "IdentifierPath",
                           "referencedDeclaration": 20,
                           "src": "1148:4:0"
@@ -13856,10 +13826,7 @@
                       "id": 121,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        4294967278,
-                        4294967278
-                      ],
+                      "overloadedDeclarations": [4294967278, 4294967278],
                       "referencedDeclaration": 4294967278,
                       "src": "1193:7:0",
                       "typeDescriptions": {
@@ -14625,9 +14592,7 @@
                     "pathNode": {
                       "id": 184,
                       "name": "Book",
-                      "nameLocations": [
-                        "1671:4:0"
-                      ],
+                      "nameLocations": ["1671:4:0"],
                       "nodeType": "IdentifierPath",
                       "referencedDeclaration": 20,
                       "src": "1671:4:0"
