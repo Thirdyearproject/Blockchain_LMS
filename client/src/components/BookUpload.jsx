@@ -9,7 +9,8 @@ const BookUpload = ({ account, privateKey }) => {
   const provider = new ethers.JsonRpcProvider(RPC_URL);
   const wallet = new ethers.Wallet(privateKey, provider);
 
-  const networkId = Object.keys(Upload.networks)[0];
+  const lastIndex = Object.keys(Upload.networks).length - 1;
+  const networkId = Object.keys(Upload.networks)[lastIndex];
   console.log("Connected networkId:", networkId);
 
   const networkData = Upload.networks[networkId];
@@ -25,7 +26,7 @@ const BookUpload = ({ account, privateKey }) => {
   const [fileName, setFileName] = useState("No file selected");
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
-  const [clearance, setClearance] = useState(0);
+  const [clearance, setClearance] = useState(0); // <--- you already have this
   const [fileType, setFileType] = useState("PDF");
   const [loading, setLoading] = useState(false);
   const [filePreviewUrl, setFilePreviewUrl] = useState(null);
@@ -79,13 +80,13 @@ const BookUpload = ({ account, privateKey }) => {
 
         const bookId = keccak256(toUtf8Bytes(title + author));
 
-        const transaction = await contract.proposeBook(
+        const transaction = await contract.addBook(
           bookId,
           title,
           author,
           ipfsHash,
-          clearance,
-          FILE_TYPE_ENUM[fileType] // Map string to numeric value
+          clearance, // 👈 REQUIRED CLEARANCE added
+          FILE_TYPE_ENUM[fileType]
         );
         await transaction.wait();
 
@@ -169,11 +170,7 @@ const BookUpload = ({ account, privateKey }) => {
           {renderPreview()}
           <label
             htmlFor="file-upload"
-            className="inline-block cursor-pointer select-none
-              bg-gradient-to-r from-blue-300 to-blue-400 
-              text-white font-semibold px-4 py-2 rounded-lg 
-              shadow-md hover:from-blue-400 hover:to-blue-500 
-              transition-colors duration-300 ease-in-out w-full text-center mb-2"
+            className="inline-block cursor-pointer select-none bg-gradient-to-r from-blue-300 to-blue-400 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:from-blue-400 hover:to-blue-500 transition-colors duration-300 ease-in-out w-full text-center mb-2"
           >
             Choose Book File
           </label>
@@ -205,9 +202,7 @@ const BookUpload = ({ account, privateKey }) => {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
-              className="block w-full rounded-md border border-gray-300 py-2 px-3
-                text-gray-900 placeholder-gray-400 focus:border-blue-500
-                focus:ring-blue-500 focus:outline-none focus:ring-1"
+              className="block w-full rounded-md border border-gray-300 py-2 px-3 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 focus:outline-none focus:ring-1"
             />
           </div>
 
@@ -225,9 +220,25 @@ const BookUpload = ({ account, privateKey }) => {
               value={author}
               onChange={(e) => setAuthor(e.target.value)}
               required
-              className="block w-full rounded-md border border-gray-300 py-2 px-3
-                text-gray-900 placeholder-gray-400 focus:border-blue-500
-                focus:ring-blue-500 focus:outline-none focus:ring-1"
+              className="block w-full rounded-md border border-gray-300 py-2 px-3 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 focus:outline-none focus:ring-1"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="clearance"
+              className="block mb-1 font-semibold text-gray-700"
+            >
+              Required Clearance Level
+            </label>
+            <input
+              id="clearance"
+              type="number"
+              min="0"
+              value={clearance}
+              onChange={(e) => setClearance(Number(e.target.value))}
+              required
+              className="block w-full rounded-md border border-gray-300 py-2 px-3 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 focus:outline-none focus:ring-1"
             />
           </div>
 
@@ -243,9 +254,7 @@ const BookUpload = ({ account, privateKey }) => {
               value={fileType}
               onChange={(e) => setFileType(e.target.value)}
               required
-              className="block w-full rounded-md border border-gray-300 py-2 px-3
-                bg-white text-gray-900 focus:border-blue-500 focus:ring-blue-500
-                focus:outline-none focus:ring-1"
+              className="block w-full rounded-md border border-gray-300 py-2 px-3 bg-white text-gray-900 focus:border-blue-500 focus:ring-blue-500 focus:outline-none focus:ring-1"
             >
               <option value="PDF">PDF</option>
               <option value="EPUB">EPUB</option>
@@ -259,13 +268,11 @@ const BookUpload = ({ account, privateKey }) => {
           <button
             type="submit"
             disabled={!file || loading}
-            className={`w-full py-3 rounded-lg text-white font-semibold text-lg
-              transition-colors duration-300 ease-in-out shadow-md
-              ${
-                loading || !file
-                  ? "bg-blue-300 cursor-not-allowed"
-                  : "bg-blue-400 hover:bg-blue-500 active:bg-blue-600 cursor-pointer"
-              }`}
+            className={`w-full py-3 rounded-lg text-white font-semibold text-lg transition-colors duration-300 ease-in-out shadow-md ${
+              loading || !file
+                ? "bg-blue-300 cursor-not-allowed"
+                : "bg-blue-400 hover:bg-blue-500 active:bg-blue-600 cursor-pointer"
+            }`}
           >
             {loading ? "Uploading..." : "Upload Book"}
           </button>

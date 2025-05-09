@@ -3,9 +3,6 @@ import { ethers } from "ethers";
 import Navbar from "../Dashboard/Navbar";
 import ELibrary from "../../build/contracts/BookManager.json";
 import { RPC_URL } from "../../services/apis";
-
-// 1746774890805;
-
 function GuestDashboard() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,7 +14,9 @@ function GuestDashboard() {
         const provider = new ethers.JsonRpcProvider(RPC_URL);
 
         // 2. Get network information
-        const networkId = Object.keys(ELibrary.networks)[0];
+        const lastIndex = Object.keys(ELibrary.networks).length - 1;
+
+        const networkId = Object.keys(ELibrary.networks)[lastIndex];
         console.log("Connected networkId:", networkId);
 
         // 3. Get deployed network data from JSON
