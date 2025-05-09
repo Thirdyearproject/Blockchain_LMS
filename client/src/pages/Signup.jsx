@@ -23,8 +23,9 @@ export default function Signup() {
       const provider = new ethers.JsonRpcProvider(RPC_URL);
 
       const adminSigner = await provider.getSigner(0);
-      console.log(UserManagerABI.networks);
-      const networkId = Object.keys(UserManagerABI.networks)[0];
+
+      const lastIndex = Object.keys(UserManagerABI.networks).length - 1;
+      const networkId = Object.keys(UserManagerABI.networks)[lastIndex];
 
       const networkData = UserManagerABI.networks[networkId];
       if (!networkData || !networkData.address) {

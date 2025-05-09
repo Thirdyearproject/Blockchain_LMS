@@ -5,56 +5,59 @@ import "./UserManager.sol";
 import "./BookManager.sol";
 
 contract BorrowManager {
-    struct BorrowInfo {
+    struct Borrow {
+        address user;
         uint bookId;
         uint borrowTime;
         uint returnTime;
-        address borrower;
+        bool returned;
     }
 
-    BorrowInfo[] public borrows;
+    Borrow[] public borrows;
+    mapping(address => mapping(uint => bool)) public hasBorrowed;
+
     UserManager public userManager;
     BookManager public bookManager;
 
-    constructor(address userManagerAddress, address bookManagerAddress) {
-        userManager = UserManager(userManagerAddress);
-        bookManager = BookManager(bookManagerAddress);
+    constructor(address _userManager, address _bookManager) {
+        userManager = UserManager(_userManager);
+        bookManager = BookManager(_bookManager);
     }
 
     function borrowBook(uint _bookId) external {
         BookManager.Book memory book = bookManager.getBook(_bookId);
-
+        require(uint(userManager.getClearance(msg.sender)) >= book.requiredClearance, "Insufficient clearance");
         require(book.status == BookManager.Status.Approved, "Book not approved");
-        require(uint(userManager.getClearance(msg.sender)) >= book.requiredClearance, "Not enough clearance to borrow");
+        require(!hasBorrowed[msg.sender][_bookId], "Already borrowed");
 
-        borrows.push(BorrowInfo(_bookId, block.timestamp, 0, msg.sender));
+        borrows.push(Borrow({
+            user: msg.sender,
+            bookId: _bookId,
+            borrowTime: block.timestamp,
+            returnTime: 0,
+            returned: false
+        }));
+
+        hasBorrowed[msg.sender][_bookId] = true;
     }
 
     function returnBook(uint _borrowId) external {
-        BorrowInfo storage borrowInfo = borrows[_borrowId];
+        require(_borrowId < borrows.length, "Invalid borrow ID");
+        Borrow storage borrow = borrows[_borrowId];
 
-        require(borrowInfo.borrower == msg.sender, "Not your borrow record");
-        require(borrowInfo.returnTime == 0, "Already returned");
+        require(borrow.user == msg.sender, "Not your borrow record");
+        require(!borrow.returned, "Already returned");
 
-        borrowInfo.returnTime = block.timestamp;
+        borrow.returnTime = block.timestamp;
+        borrow.returned = true;
+        hasBorrowed[msg.sender][borrow.bookId] = false;
     }
 
-    function getUserBorrows(address _user) external view returns (BorrowInfo[] memory) {
-        uint count = 0;
-        for (uint i = 0; i < borrows.length; i++) {
-            if (borrows[i].borrower == _user) {
-                count++;
-            }
-        }
+    function getAllBorrows() external view returns (Borrow[] memory) {
+        return borrows;
+    }
 
-        BorrowInfo[] memory result = new BorrowInfo[](count);
-        uint index = 0;
-        for (uint i = 0; i < borrows.length; i++) {
-            if (borrows[i].borrower == _user) {
-                result[index] = borrows[i];
-                index++;
-            }
-        }
-        return result;
+    function getBorrowsCount() external view returns (uint) {
+        return borrows.length;
     }
 }
