@@ -23,7 +23,6 @@ export default function Signup() {
       const provider = new ethers.JsonRpcProvider(RPC_URL);
 
       const adminSigner = await provider.getSigner(0);
-
       const lastIndex = Object.keys(UserManagerABI.networks).length - 1;
       const networkId = Object.keys(UserManagerABI.networks)[lastIndex];
 
@@ -38,7 +37,6 @@ export default function Signup() {
         UserManagerABI.abi,
         adminSigner
       );
-
       const addresses = await provider.listAccounts();
 
       let registeredAccounts = [];
@@ -60,15 +58,8 @@ export default function Signup() {
         const tx = await contract.setClearance(userAddr, clearanceLevel);
         await tx.wait();
 
-        console.log(
-          `✅ ${userAddr} registered with Clearance Level ${
-            clearanceLevel === 3
-              ? "Level3"
-              : clearanceLevel === 2
-              ? "Level2"
-              : "Level1"
-          }`
-        );
+        const cl = await contract.getClearance(userAddr);
+        console.log(`✅ ${userAddr} registered with Clearance Level ${cl}`);
 
         registeredAccounts.push({
           userAddr,

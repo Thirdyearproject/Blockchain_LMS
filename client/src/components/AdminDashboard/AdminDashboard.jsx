@@ -1,206 +1,68 @@
 import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { ethers } from "ethers";
 import Navbar from "../Dashboard/Navbar";
 import BookUpload from "../BookUpload";
 import Books from "../Books";
 import RegisterUser from "../RegisterUser";
 import UpdateClearance from "../UpdateClearance";
-import ValidateBook from "../ValidateBook";
-import { setUser } from "../../redux/Slices/authSlice";
-import { WalletLogin } from "../../services/operations/authApi";
+import VoteOnBooks from "../VoteOnBooks";
 
 function AdminDashboard() {
-  const { user, token } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
 
-  // Parse accounts from user data
-  const accounts = user && user.length > 0 ? user : [];
-
-  const [account, setAccount] = useState("");
-  const [contract, setContract] = useState(null);
-  const [provider, setProvider] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [privateKey, setPrivateKey] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [selectedAccount, setSelectedAccount] = useState(null);
 
-  // Function to initialize wallet with private key
-  const initializeWallet = async (privateKey) => {
-    const wallet = new ethers.Wallet(privateKey);
-    const provider = new ethers.JsonRpcProvider(process.env.REACT_APP_RPC_URL);
-    const signer = wallet.connect(provider);
-    return { contract: null, address: wallet.address };
-  };
-
-  // Handle account selection from Redux store
-  const handleAccountSelect = async (acc) => {
-    try {
-      setIsLoading(true);
-      setErrorMessage("");
-      console.log("Selecting account:", acc.account_name);
-
-      // testing
-      // const { contract: contractInstance, address } = await initializeWallet(
-      //   acc.privateKey
-      // );
-
-      setSelectedAccount(acc);
-
-      // testing
-      setAccount(acc.account_name);
-      // setAccount(address);
-      // setContract(contractInstance);
-
-      console.log("Account selected successfully");
-    } catch (error) {
-      console.error("Account selection error:", error);
-      setErrorMessage(error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Connect with MetaMask
-  const connectWithMetaMask = async () => {
-    if (!window.ethereum) {
-      alert("MetaMask is not installed. Please install it to continue.");
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      setErrorMessage("");
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      const signer = await provider.getSigner();
-      const address = await signer.getAddress();
-
-      // Generate a timestamp for the message
-      const timestamp = Date.now();
-      const message = `Sign this message to verify login: ${timestamp}`;
-
-      const signature = await signer.signMessage(message);
-
-      const result = await WalletLogin({ address, signature, timestamp });
-
-      if (result?.token && result?.user) {
-        dispatch(setUser(result.user));
-
-        // Set the account details
-        setAccount(address);
-        setProvider(provider);
-        setContract(null); // Since we don't have a contract instance yet
-        setSelectedAccount({ account_name: "MetaMask Account" });
-      } else {
-        throw new Error("Wallet authentication failed.");
-      }
-    } catch (error) {
-      console.error("MetaMask connection error:", error);
-      setErrorMessage(error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Auto-select account on component mount if only one account
   useEffect(() => {
-    const autoSelectAccount = async () => {
+    const getPrivateKey = async () => {
+      const inputKey = prompt("Please enter your private key:");
+      if (!inputKey) {
+        setErrorMessage("Private key is required.");
+        return;
+      }
       try {
-        if (accounts.length === 1) {
-          await handleAccountSelect(accounts[0]);
-        }
+        setPrivateKey(inputKey);
       } catch (error) {
-        console.error("Auto account selection error:", error);
+        console.error("Invalid private key:", error);
+        setErrorMessage("Invalid private key entered.");
       }
     };
 
-    autoSelectAccount();
-  }, [accounts]);
+    getPrivateKey();
+  }, []);
 
-  // Render loading state
-  if (isLoading) {
-    return (
-      <div className="loading-container">
-        <p>Loading...</p>
-      </div>
-    );
-  }
-
-  // Render error message
   const renderErrorMessage = () => {
     if (errorMessage) {
       return (
-        <div className="error-banner">
+        <div className="error-banner bg-red-200 p-2 rounded mt-2">
           {errorMessage}
-          <button onClick={() => setErrorMessage("")}>✕</button>
+          <button
+            onClick={() => setErrorMessage("")}
+            className="ml-2 text-red-600 font-bold"
+          >
+            ✕
+          </button>
         </div>
       );
     }
     return null;
   };
 
-  // Render account selection
-  const renderAccountSelection = () => {
-    if (!selectedAccount) {
-      return (
-        <div className="account-selection">
-          <h2>Select an Account</h2>
-          <div className="account-list">
-            {accounts.map((acc, index) => (
-              <button
-                key={index}
-                onClick={() => handleAccountSelect(acc)}
-                className="account-button"
-              >
-                {acc.account_name}
-              </button>
-            ))}
-            <button onClick={connectWithMetaMask} className="account-button">
-              Connect with MetaMask
-            </button>
-          </div>
-        </div>
-      );
-    }
-    return null;
-  };
-
-  // Render main dashboard content
   const renderDashboardContent = () => {
-    console.log(selectedAccount, account);
-    if (selectedAccount && (account || contract)) {
-      return (
-        <div>
-          <BookUpload
-            account={account}
-            provider={provider}
-            contract={contract}
-          />
-
-          <hr className="black-line" />
-
-          <Books
-            contract={contract}
-            account={account}
-            provider={provider}
-            selectedAccount={selectedAccount}
-          />
-          <hr className="black-line" />
-
-          {selectedAccount && selectedAccount.isAdmin && (
-            <div>
-              <RegisterUser contract={contract} account={account} />
-              <UpdateClearance contract={contract} account={account} />
-            </div>
-          )}
-
-          {/* User functionalities */}
-          <ValidateBook contract={contract} account={account} />
-        </div>
-      );
-    }
-    return null;
+    if (!privateKey) return null; // don't show dashboard if key not set
+    return (
+      <div>
+        <BookUpload account={user} privateKey={privateKey} />
+        <hr className="black-line" />
+        <Books account={user} privateKey={privateKey} />
+        <hr className="black-line" />
+        <RegisterUser account={user} privateKey={privateKey} />
+        <UpdateClearance account={user} privateKey={privateKey} />
+        <hr className="black-line" />
+        <VoteOnBooks account={user} privateKey={privateKey} />
+      </div>
+    );
   };
 
   return (
@@ -212,13 +74,11 @@ function AdminDashboard() {
       {renderErrorMessage()}
 
       <div className="w-full flex lg:flex-nowrap flex-wrap gap-6 mx-auto h-fit">
-        {/* Account display */}
         <div className="header">
-          {account && <p style={{ color: "black" }}>Account: {account}</p>}
+          <p style={{ color: "black" }}>Account: {user}</p>
           <hr className="black-line" />
         </div>
 
-        {renderAccountSelection()}
         {renderDashboardContent()}
       </div>
     </div>
