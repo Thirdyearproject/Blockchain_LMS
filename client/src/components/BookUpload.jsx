@@ -117,7 +117,7 @@ const BookUpload = ({ account, privateKey }) => {
     if (!file || !filePreviewUrl) return null;
 
     return (
-      <div className="w-full h-96 border rounded-md overflow-hidden mb-4 flex items-center justify-center bg-gray-100">
+      <div className="w-full h-96 border-2 border-gray-300 rounded-md overflow-hidden mb-4 flex items-center justify-center bg-gray-50">
         {fileType === "PDF" ? (
           <object
             data={filePreviewUrl}
@@ -157,7 +157,7 @@ const BookUpload = ({ account, privateKey }) => {
 
   return (
     <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-xl p-8 mt-10 space-y-8">
-      <h2 className="text-2xl font-bold text-center text-blue-600">
+      <h2 className="text-2xl font-semibold text-center text-blue-600 mb-4">
         Upload New Book
       </h2>
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -170,7 +170,7 @@ const BookUpload = ({ account, privateKey }) => {
             id="file-upload"
             name="data"
             onChange={retrieveFile}
-            className="block w-full text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
+            className="block w-full text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 focus:ring-2 focus:ring-blue-500"
           />
           <p className="text-sm italic text-gray-500 break-words">
             File: {fileName}

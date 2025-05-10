@@ -72,8 +72,8 @@ const Books = ({ account, privateKey }) => {
 
       for (let i = 0; i < totalBooks; i++) {
         const book = await bookContract.getBook(i);
-        console.log(book);
         books.push({
+          index: i,
           id: book.bookId,
           title: book.title,
           author: book.author,
@@ -91,7 +91,7 @@ const Books = ({ account, privateKey }) => {
         if (book.status === 1) {
           const alreadyBorrowed = await borrowContract.hasBorrowed(
             account,
-            book.id
+            book.index
           );
           console.log(alreadyBorrowed);
           alreadyBorrowed ? borrowed.push(book) : available.push(book);
@@ -108,14 +108,14 @@ const Books = ({ account, privateKey }) => {
     }
   };
 
-  const borrowBook = async (bookId) => {
+  const borrowBook = async (bookIndex) => {
     if (!borrowContract) {
       console.error("Borrow Contract not initialized");
       return;
     }
-    console.log(bookId);
+    console.log(bookIndex);
     try {
-      const tx = await borrowContract.borrowBook(bookId, account);
+      const tx = await borrowContract.borrowBook(bookIndex, account);
       await tx.wait();
       alert("Book borrowed successfully!");
       await fetchBooks();
@@ -125,45 +125,75 @@ const Books = ({ account, privateKey }) => {
     }
   };
 
+  const returnBook = async (bookId) => {
+    if (!borrowContract) {
+      console.error("Borrow Contract not initialized");
+      return;
+    }
+    try {
+      // Find the borrow record ID (`_borrowId`) for this user and book
+      const borrows = await borrowContract.getAllBorrows();
+      const borrowId = borrows.findIndex(
+        (b) =>
+          b.user.toLowerCase() === account.toLowerCase() &&
+          Number(b.bookId) === bookId &&
+          !b.returned
+      );
+
+      if (borrowId === -1) {
+        alert("No active borrow record found for this book.");
+        return;
+      }
+
+      const tx = await borrowContract.returnBook(borrowId);
+      await tx.wait();
+      alert("Book returned successfully!");
+      await fetchBooks();
+    } catch (error) {
+      console.error("Error returning book:", error);
+      alert("Failed to return book.");
+    }
+  };
+
   return (
-    <div className="max-w-6xl mx-auto my-12 p-8 bg-gray-100 rounded-lg shadow-2xl">
-      <h1 className="text-4xl font-bold text-center mb-10 text-indigo-800">
+    <div className="max-w-7xl mx-auto my-16 p-10 bg-gradient-to-b from-indigo-50 to-white rounded-3xl shadow-2xl">
+      <h1 className="text-5xl font-extrabold text-center mb-14 text-indigo-800 tracking-tight">
         📚 Library Book Management
       </h1>
 
-      <div className="flex justify-center mb-10">
+      <div className="flex justify-center mb-14">
         <button
           onClick={fetchBooks}
           disabled={loading}
-          className={`${
+          className={`px-10 py-4 rounded-full font-bold text-lg shadow-md transition-all duration-300 ${
             loading
-              ? "bg-indigo-300 cursor-not-allowed"
-              : "bg-indigo-600 hover:bg-indigo-700"
-          } text-white px-8 py-3 rounded-lg font-semibold text-lg transition-all`}
+              ? "bg-indigo-300 text-white cursor-not-allowed"
+              : "bg-indigo-600 hover:bg-indigo-700 text-white hover:scale-105"
+          }`}
         >
           {loading ? "Fetching..." : "Fetch Books"}
         </button>
       </div>
 
       {/* All Books Section */}
-      <section className="mb-14">
-        <h2 className="text-3xl font-semibold mb-6 text-purple-700 border-b-2 pb-2 border-purple-300">
+      <section className="mb-20">
+        <h2 className="text-4xl font-bold mb-8 text-purple-700 border-b-4 pb-4 border-purple-300">
           📖 All Books
         </h2>
         {allBooks.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {allBooks.map((book) => (
               <div
-                key={book.id}
-                className="bg-white p-6 rounded-lg shadow-md flex flex-col justify-between"
+                key={book.index}
+                className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col justify-between border border-gray-200"
               >
                 <div>
-                  <h3 className="text-xl font-bold text-gray-800">
+                  <h3 className="text-2xl font-semibold text-gray-900 mb-2">
                     {book.title}
                   </h3>
-                  <p className="text-gray-500 mb-4">by {book.author}</p>
+                  <p className="text-gray-500 mb-6">by {book.author}</p>
                   <p
-                    className={`text-sm font-semibold ${
+                    className={`text-md font-semibold ${
                       book.status === 1
                         ? "text-green-600"
                         : "text-gray-400 italic"
@@ -176,28 +206,28 @@ const Books = ({ account, privateKey }) => {
             ))}
           </div>
         ) : (
-          <p className="text-gray-500 italic">No books available.</p>
+          <p className="text-gray-400 italic mt-4">No books available.</p>
         )}
       </section>
 
       {/* Available Books Section */}
-      <section className="mb-14">
-        <h2 className="text-3xl font-semibold mb-6 text-blue-700 border-b-2 pb-2 border-blue-300">
+      <section className="mb-20">
+        <h2 className="text-4xl font-bold mb-8 text-blue-700 border-b-4 pb-4 border-blue-300">
           🆓 Available Books
         </h2>
         {availableBooks.length > 0 ? (
-          <ul className="divide-y divide-gray-300">
+          <ul className="divide-y divide-gray-200">
             {availableBooks.map((book) => (
               <li
-                key={book.id}
-                className="flex justify-between items-center py-4"
+                key={book.index}
+                className="flex justify-between items-center py-6 hover:bg-indigo-50 px-4 rounded-xl transition-all duration-300"
               >
-                <p className="text-lg font-medium text-gray-800">
+                <p className="text-xl font-medium text-gray-800">
                   {book.title}
                 </p>
                 <button
-                  onClick={() => borrowBook(book.id)}
-                  className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg font-semibold transition"
+                  onClick={() => borrowBook(book.index)}
+                  className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-full font-semibold transition-all hover:scale-105"
                 >
                   Borrow
                 </button>
@@ -205,43 +235,50 @@ const Books = ({ account, privateKey }) => {
             ))}
           </ul>
         ) : (
-          <p className="text-gray-500 italic">No available books to borrow.</p>
+          <p className="text-gray-400 italic mt-4">
+            No available books to borrow.
+          </p>
         )}
       </section>
 
       {/* Borrowed Books Section */}
       <section>
-        <h2 className="text-3xl font-semibold mb-6 text-green-700 border-b-2 pb-2 border-green-300">
+        <h2 className="text-4xl font-bold mb-8 text-green-700 border-b-4 pb-4 border-green-300">
           ✅ Borrowed Books
         </h2>
         {borrowedBooks.length > 0 ? (
-          <ul className="divide-y divide-gray-300">
+          <ul className="divide-y divide-gray-200">
             {borrowedBooks.map((book) => (
               <li
                 key={book.id}
-                className="flex justify-between items-center py-4"
+                className="flex flex-col md:flex-row md:justify-between md:items-center py-6 hover:bg-green-50 px-4 rounded-xl transition-all duration-300 space-y-4 md:space-y-0"
               >
                 <div>
-                  <p className="text-lg font-medium text-gray-800">
+                  <p className="text-xl font-medium text-gray-800">
                     {book.title}
                   </p>
-                  <p className="text-gray-500 italic">
-                    Return functionality coming soon
-                  </p>
                 </div>
-                <a
-                  href={`https://gateway.pinata.cloud/ipfs/${book.ipfsHash}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition"
-                >
-                  Open File
-                </a>
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => returnBook(book.index)}
+                    className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-full font-semibold transition-all hover:scale-105"
+                  >
+                    Return
+                  </button>
+                  <a
+                    href={`https://gateway.pinata.cloud/ipfs/${book.ipfsHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full font-semibold transition-all hover:scale-105"
+                  >
+                    Open File
+                  </a>
+                </div>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-gray-500 italic">No borrowed books yet.</p>
+          <p className="text-gray-400 italic mt-4">No borrowed books yet.</p>
         )}
       </section>
     </div>

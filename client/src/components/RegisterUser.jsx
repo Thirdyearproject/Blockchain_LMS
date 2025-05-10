@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { IoIosArrowBack } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import { setSignup } from "../redux/Slices/authSlice";
-
 import { ethers } from "ethers";
 import UserManagerABI from "../build/contracts/UserManager.json";
 import { RPC_URL } from "../services/apis";
@@ -58,7 +56,7 @@ export default function RegisterUser({ privateKey }) {
         const tx = await contract.setClearance(userAddr, clearanceLevel, {
           nonce: currentNonce,
         });
-        currentNonce += 1; // Manually increment nonce
+        currentNonce += 1;
         await tx.wait();
 
         const clear = await contract.getClearance(userAddr);
@@ -83,21 +81,30 @@ export default function RegisterUser({ privateKey }) {
   };
 
   return (
-    <div className="flex bg-[#f9fafa] min-h-screen w-screen">
-    <div className="flex flex-1 flex-col items-center justify-center">
-      <div className="w-full max-w-3xl p-4">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-100 p-6">
+      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
+        <h1 className="text-3xl font-bold text-indigo-700 mb-6">
+          Register Accounts
+        </h1>
+        <p className="text-gray-600 mb-8">
+          Click the button below to register all user accounts on the
+          blockchain.
+        </p>
+
         <button
           onClick={handleRegisterAll}
           disabled={isLoading}
-          className="mt-6 w-full px-5 py-3 bg-indigo-600 text-white rounded disabled:opacity-50"
+          className="w-full py-3 px-6 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? "Registering…" : "Register All Accounts"}
         </button>
-  
-        {isLoading && <div className="mt-3 text-gray-600">Loading…</div>}
+
+        {isLoading && (
+          <div className="flex items-center justify-center mt-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-600"></div>
+          </div>
+        )}
       </div>
     </div>
-  </div>
-  
   );
 }

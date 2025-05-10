@@ -20,39 +20,37 @@ function TeacherDashboard({ setPrivateKey }) {
   };
 
   return (
-    <div className="flex-1 p-6 w-full max-w-[1600px] mx-auto flex flex-col gap-8">
+    <div className="flex-1 p-6 w-full max-w-screen-xl mx-auto flex flex-col gap-8">
       {/* Navbar */}
       <Navbar name="Teacher Dashboard" />
 
       {/* Account Info */}
-      <div className="bg-white p-4 rounded shadow-md">
-        <p className="text-gray-700 font-semibold break-words">
-          Account: {user}
-        </p>
+      <div className="bg-white p-6 rounded-xl shadow-xl">
+        <p className="text-gray-800 font-semibold text-lg">Account: {user}</p>
       </div>
 
       {/* Private Key Input */}
-      <div className="bg-white p-4 rounded shadow-md mt-6">
-        <p className="text-gray-700 font-semibold mb-2">
+      <div className="bg-white p-6 rounded-xl shadow-xl mt-6">
+        <p className="text-gray-800 font-semibold mb-4 text-lg">
           Set your Private Key:
         </p>
         <input
           type="text"
-          className="border p-2 w-full rounded"
+          className="border p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
           placeholder="Enter your private key"
           value={privateKeyInput}
           onChange={handlePrivateKeyChange}
         />
         <button
           onClick={handlePrivateKeySubmit}
-          className="mt-4 bg-blue-500 text-white p-2 rounded"
+          className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-lg font-semibold hover:bg-blue-700 transition"
         >
           Set Private Key
         </button>
       </div>
 
       {/* Instructions */}
-      <div className="text-gray-600 mt-6">
+      <div className="text-gray-600 mt-6 text-sm text-center">
         Please enter the Private Key and select an option from the sidebar to
         continue.
       </div>

@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import Navbar from "../Dashboard/Navbar";
 import ELibrary from "../../build/contracts/BookManager.json";
 import { RPC_URL } from "../../services/apis";
+
 function GuestDashboard() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,7 +16,6 @@ function GuestDashboard() {
 
         // 2. Get network information
         const lastIndex = Object.keys(ELibrary.networks).length - 1;
-
         const networkId = Object.keys(ELibrary.networks)[lastIndex];
         console.log("Connected networkId:", networkId);
 
@@ -33,7 +33,6 @@ function GuestDashboard() {
           ELibrary.abi,
           provider
         );
-
         console.log("Contract loaded:", contract.target);
 
         // 5. Fetch books
@@ -41,10 +40,10 @@ function GuestDashboard() {
         console.log("Books count:", booksCount.toString());
 
         const booksArray = [];
-
         for (let i = 0; i < booksCount; i++) {
           const book = await contract.getBook(i);
-          booksArray.push(book.title); // Only title
+          // Assuming the contract returns an object with title and author
+          booksArray.push({ title: book.title, author: book.author });
         }
 
         setBooks(booksArray);
@@ -59,24 +58,35 @@ function GuestDashboard() {
   }, []);
 
   return (
-    <div className="flex flex-col bg-gray-100 min-h-screen w-full p-4">
+    <div className="flex flex-col bg-gray-50 min-h-screen w-full p-6">
       <Navbar name="Guest Dashboard" />
 
-      <div className="w-full flex flex-col gap-6 mx-auto mt-8">
-        <h2 className="text-2xl font-bold text-center">Library Books</h2>
+      <div className="w-full max-w-4xl mx-auto mt-8 flex flex-col gap-6">
+        <h2 className="text-3xl font-bold text-center text-gray-800">
+          Library Books
+        </h2>
 
         {loading ? (
-          <p className="text-center">Loading books...</p>
+          <div className="flex justify-center items-center text-xl text-gray-600">
+            <span>Loading books...</span>
+          </div>
         ) : books.length > 0 ? (
-          <div className="flex flex-col gap-4">
-            {books.map((title, idx) => (
-              <div key={idx} className="bg-white p-4 rounded shadow-md text-lg">
-                {idx + 1}. {title}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {books.map((book, idx) => (
+              <div
+                key={idx}
+                className="bg-white p-5 rounded-xl shadow-lg text-lg text-gray-700 hover:bg-gray-100 transition duration-300"
+              >
+                <span className="text-xl font-semibold">{idx + 1}. </span>
+                <div className="text-gray-900 font-bold">{book.title}</div>
+                <div className="text-gray-600 text-sm">by {book.author}</div>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-center">No books available</p>
+          <p className="text-center text-lg text-gray-600">
+            No books available
+          </p>
         )}
       </div>
     </div>
