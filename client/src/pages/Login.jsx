@@ -9,46 +9,58 @@ import UserManagerABI from "../build/contracts/UserManager.json";
 function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // State to store wallet address and any authentication errors
   const [walletAddress, setWalletAddress] = useState("");
   const [authError, setAuthError] = useState("");
 
-  const loginWithAddress = async (address) => {
+  // Function to handle login using the given address (manual or from MetaMask)
+  const loginWithWalletAddress = async (address) => {
     if (!address) {
       setAuthError("Wallet address is required.");
       return;
     }
 
+    // Connect to blockchain using RPC provider
     const provider = new ethers.JsonRpcProvider(RPC_URL);
 
-    const lastIndex = Object.keys(UserManagerABI.networks).length - 1;
-    const networkId = Object.keys(UserManagerABI.networks)[lastIndex];
+    // Find the latest deployed network details for UserManager contract
+    const lastDeployedNetworkIndex =
+      Object.keys(UserManagerABI.networks).length - 1;
+    const latestNetworkId = Object.keys(UserManagerABI.networks)[
+      lastDeployedNetworkIndex
+    ];
+    const latestNetworkData = UserManagerABI.networks[latestNetworkId];
 
-    const networkData = UserManagerABI.networks[networkId];
-    if (!networkData || !networkData.address) {
-      console.error(`Contract not deployed on network ${networkId}`);
+    if (!latestNetworkData || !latestNetworkData.address) {
+      console.error(`Contract not deployed on network ${latestNetworkId}`);
       return;
     }
 
-    const userManager = new ethers.Contract(
-      networkData.address,
+    // Create instance of UserManager smart contract
+    const userManagerContract = new ethers.Contract(
+      latestNetworkData.address,
       UserManagerABI.abi,
       provider
     );
 
-    let adminAddress;
+    let adminWalletAddress;
     try {
-      adminAddress = await userManager.admin();
+      adminWalletAddress = await userManagerContract.admin();
     } catch (error) {
       console.error("Error fetching admin address:", error);
       setAuthError("Could not fetch admin address.");
       return;
     }
 
-    if (address.toLowerCase() === adminAddress.toLowerCase()) {
+    // Check if the logged-in address is admin
+    if (address.toLowerCase() === adminWalletAddress.toLowerCase()) {
       const dummyToken = "dummy-token";
+
+      // Save token and user info locally and in Redux store
       localStorage.setItem("lmstoken", JSON.stringify(dummyToken));
       localStorage.setItem("lmsuser", JSON.stringify(address));
-      localStorage.setItem("type", JSON.stringify(4)); // Admin type
+      localStorage.setItem("type", JSON.stringify(4)); // 4 indicates Admin type
 
       dispatch(setToken(dummyToken));
       dispatch(setUser(address));
@@ -58,59 +70,61 @@ function Login() {
       return;
     }
 
-    // Check user clearance
-    let clearanceLevel;
+    // If not admin, check user's clearance level
+    let userClearanceLevel;
     try {
-      clearanceLevel = await userManager.getClearance(address);
-      console.log("Clearance Level:", clearanceLevel);
+      userClearanceLevel = await userManagerContract.getClearance(address);
     } catch (error) {
-      console.error("Error fetching clearance level:", error);
-      setAuthError("Failed to fetch clearance level.");
+      setAuthError("User not registered. Please contact admin.");
       return;
     }
-
-    if (clearanceLevel === 0n) {
+    if (userClearanceLevel == 0) {
       setAuthError("User not registered. Please contact admin.");
       return;
     }
 
     const dummyToken = "dummy-token";
+
+    // Save token and user info locally and in Redux store
     localStorage.setItem("lmstoken", JSON.stringify(dummyToken));
     localStorage.setItem("lmsuser", JSON.stringify(address));
-    localStorage.setItem("type", JSON.stringify(Number(clearanceLevel)));
+    localStorage.setItem("type", JSON.stringify(Number(userClearanceLevel)));
 
     dispatch(setToken(dummyToken));
     dispatch(setUser(address));
-    dispatch(setType(Number(clearanceLevel)));
+    dispatch(setType(Number(userClearanceLevel)));
 
     navigate("/dashboard");
   };
 
-  const handleWalletLogin = async () => {
+  // Function to login with MetaMask wallet connection
+  const handleMetaMaskLogin = async () => {
     if (!window.ethereum) {
       alert("MetaMask is not installed.");
       return;
     }
 
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-      const address = await signer.getAddress();
-      setWalletAddress(address);
+      const browserProvider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await browserProvider.getSigner();
+      const connectedAddress = await signer.getAddress();
+      setWalletAddress(connectedAddress);
 
-      await loginWithAddress(address);
-    } catch (err) {
-      console.error(err);
+      await loginWithWalletAddress(connectedAddress);
+    } catch (error) {
+      console.error(error);
       setAuthError("MetaMask login failed.");
     }
   };
 
-  const handleManualLogin = async () => {
-    await loginWithAddress(walletAddress);
+  // Function to login manually using entered wallet address
+  const handleManualWalletLogin = async () => {
+    await loginWithWalletAddress(walletAddress);
   };
 
   return (
     <div className="flex h-screen">
+      {/* Centered Login Form */}
       <div className="w-full flex items-center justify-center bg-[#f9fafa]">
         <div className="lg:w-[500px] w-[400px]">
           <div className="flex flex-col">
@@ -120,7 +134,7 @@ function Login() {
 
           <div className="p-5 mt-10 bg-white shadow rounded-2xl">
             <div className="flex flex-col gap-4 mt-6">
-              <label htmlFor="walletAddress" className="lable-class">
+              <label htmlFor="walletAddress" className="label-class">
                 Wallet Address
               </label>
               <input
@@ -133,19 +147,22 @@ function Login() {
                 placeholder="Enter Wallet Address"
               />
 
+              {/* Show authentication error if any */}
               {authError && <p className="text-red-500">{authError}</p>}
 
+              {/* Manual login button */}
               <button
                 type="button"
-                onClick={handleManualLogin}
+                onClick={handleManualWalletLogin}
                 className="px-6 py-3 rounded-xl text-white bg-[#4caf50]"
               >
                 Login with Entered Address
               </button>
 
+              {/* MetaMask login button */}
               <button
                 type="button"
-                onClick={handleWalletLogin}
+                onClick={handleMetaMaskLogin}
                 className="px-6 py-3 rounded-xl text-white bg-[#f7931a]"
               >
                 {walletAddress

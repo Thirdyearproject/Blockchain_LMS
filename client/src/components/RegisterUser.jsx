@@ -2,11 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IoIosArrowBack } from "react-icons/io";
 import { useDispatch } from "react-redux";
-import {
-  setSignup,
-  resetSignupData,
-  setRegisteredAccounts,
-} from "../redux/Slices/authSlice";
+import { setSignup } from "../redux/Slices/authSlice";
 
 import { ethers } from "ethers";
 import UserManagerABI from "../build/contracts/UserManager.json";
@@ -69,15 +65,9 @@ export default function RegisterUser({ privateKey }) {
         console.log(
           `✅ ${userAddr} registered with Clearance Level ${clear.toString()}`
         );
-
-        registeredAccounts.push({
-          userAddr,
-          clearanceLevel,
-        });
       }
 
       dispatch(setSignup(true));
-      dispatch(setRegisteredAccounts(registeredAccounts));
       localStorage.setItem(
         "registeredAccounts",
         JSON.stringify(registeredAccounts)
