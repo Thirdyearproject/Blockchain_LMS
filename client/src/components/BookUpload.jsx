@@ -3,22 +3,13 @@ import axios from "axios";
 import { keccak256, toUtf8Bytes, ethers } from "ethers";
 
 import Upload from "../build/contracts/BookManager.json";
-import { RPC_URL } from "../services/apis";
+import { RPC_URL, BookAddress } from "../services/apis";
 
 const BookUpload = ({ account, privateKey }) => {
   const provider = new ethers.JsonRpcProvider(RPC_URL);
   const wallet = new ethers.Wallet(privateKey, provider);
 
-  const lastIndex = Object.keys(Upload.networks).length - 1;
-  const networkId = Object.keys(Upload.networks)[lastIndex];
-
-  const networkData = Upload.networks[networkId];
-  if (!networkData || !networkData.address) {
-    console.error(`Contract not deployed on network ${networkId}`);
-    throw new Error(`Contract not deployed on network ${networkId}`);
-  }
-
-  const contract = new ethers.Contract(networkData.address, Upload.abi, wallet);
+  const contract = new ethers.Contract(BookAddress, Upload.abi, wallet);
 
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState("No file selected");

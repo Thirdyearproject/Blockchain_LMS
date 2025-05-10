@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { setSignup } from "../redux/Slices/authSlice";
 import { ethers } from "ethers";
 import UserManagerABI from "../build/contracts/UserManager.json";
-import { RPC_URL } from "../services/apis";
+import { RPC_URL, UserAddress } from "../services/apis";
 
 export default function RegisterUser({ privateKey }) {
   const navigate = useNavigate();
@@ -17,19 +17,8 @@ export default function RegisterUser({ privateKey }) {
       const provider = new ethers.JsonRpcProvider(RPC_URL);
       const wallet = new ethers.Wallet(privateKey, provider);
 
-      const lastIndex = Object.keys(UserManagerABI.networks).length - 1;
-      const lastNetworkId = Object.keys(UserManagerABI.networks)[lastIndex];
-      const networkData = UserManagerABI.networks[lastNetworkId];
-
-      if (!networkData || !networkData.address) {
-        console.error(`Contract not deployed on network ${lastNetworkId}`);
-        alert(`Contract not deployed on network ${lastNetworkId}`);
-        setIsLoading(false);
-        return;
-      }
-
       const contract = new ethers.Contract(
-        networkData.address,
+        UserAddress,
         UserManagerABI.abi,
         wallet
       );

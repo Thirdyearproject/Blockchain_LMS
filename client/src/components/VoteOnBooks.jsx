@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ethers } from "ethers";
 import BookManager from "../build/contracts/BookManager.json"; // Correct contract
-import { RPC_URL } from "../services/apis";
+import { RPC_URL, BookAddress } from "../services/apis";
 
 const VoteOnBooks = ({ account, privateKey }) => {
   const [contract, setContract] = useState(null);
@@ -15,16 +15,8 @@ const VoteOnBooks = ({ account, privateKey }) => {
       const provider = new ethers.JsonRpcProvider(RPC_URL);
       const wallet = new ethers.Wallet(privateKey, provider);
 
-      const lastIndex = Object.keys(BookManager.networks).length - 1;
-      const networkId = Object.keys(BookManager.networks)[lastIndex];
-      const networkData = BookManager.networks[networkId];
-
-      if (!networkData || !networkData.address) {
-        throw new Error(`Contract not deployed on network ${networkId}`);
-      }
-
       const contractInstance = new ethers.Contract(
-        networkData.address,
+        BookAddress,
         BookManager.abi,
         wallet
       );

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import Navbar from "../Dashboard/Navbar";
 import ELibrary from "../../build/contracts/BookManager.json";
-import { RPC_URL } from "../../services/apis";
+import { RPC_URL, BookAddress } from "../../services/apis";
 
 function GuestDashboard() {
   const [books, setBooks] = useState([]);
@@ -14,22 +14,9 @@ function GuestDashboard() {
         // 1. Connect to blockchain
         const provider = new ethers.JsonRpcProvider(RPC_URL);
 
-        // 2. Get network information
-        const lastIndex = Object.keys(ELibrary.networks).length - 1;
-        const networkId = Object.keys(ELibrary.networks)[lastIndex];
-        console.log("Connected networkId:", networkId);
-
-        // 3. Get deployed network data from JSON
-        const networkData = ELibrary.networks[networkId];
-
-        if (!networkData || !networkData.address) {
-          console.error(`Contract not deployed on network ${networkId}`);
-          return;
-        }
-
         // 4. Create contract instance
         const contract = new ethers.Contract(
-          networkData.address,
+          BookAddress,
           ELibrary.abi,
           provider
         );

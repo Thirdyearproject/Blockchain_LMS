@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setToken, setUser, setType } from "../redux/Slices/authSlice";
-import { RPC_URL } from "../services/apis";
+import { RPC_URL, UserAddress } from "../services/apis";
 import UserManagerABI from "../build/contracts/UserManager.json";
 
 function Login() {
@@ -24,22 +24,9 @@ function Login() {
     // Connect to blockchain using RPC provider
     const provider = new ethers.JsonRpcProvider(RPC_URL);
 
-    // Find the latest deployed network details for UserManager contract
-    const lastDeployedNetworkIndex =
-      Object.keys(UserManagerABI.networks).length - 1;
-    const latestNetworkId = Object.keys(UserManagerABI.networks)[
-      lastDeployedNetworkIndex
-    ];
-    const latestNetworkData = UserManagerABI.networks[latestNetworkId];
-
-    if (!latestNetworkData || !latestNetworkData.address) {
-      console.error(`Contract not deployed on network ${latestNetworkId}`);
-      return;
-    }
-
     // Create instance of UserManager smart contract
     const userManagerContract = new ethers.Contract(
-      latestNetworkData.address,
+      UserAddress,
       UserManagerABI.abi,
       provider
     );

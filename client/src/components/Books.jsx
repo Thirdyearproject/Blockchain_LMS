@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import BookManagerArtifact from "../build/contracts/BookManager.json";
 import BorrowManagerArtifact from "../build/contracts/BorrowManager.json";
-import { RPC_URL } from "../services/apis";
+import { RPC_URL, BookAddress, BorrowAddress } from "../services/apis";
 
 const Books = ({ account, privateKey }) => {
   const [allBooks, setAllBooks] = useState([]);
@@ -18,37 +18,15 @@ const Books = ({ account, privateKey }) => {
         const provider = new ethers.JsonRpcProvider(RPC_URL);
         const wallet = new ethers.Wallet(privateKey, provider);
 
-        // Set up BookManager contract
-        const lastBookIndex =
-          Object.keys(BookManagerArtifact.networks).length - 1;
-        const bookNetworkId = Object.keys(BookManagerArtifact.networks)[
-          lastBookIndex
-        ];
-        const bookNetworkData = BookManagerArtifact.networks[bookNetworkId];
-
-        if (!bookNetworkData?.address)
-          return console.error("BookManager not deployed");
-
         const bookContractInstance = new ethers.Contract(
-          bookNetworkData.address,
+          BookAddress,
           BookManagerArtifact.abi,
           wallet
         );
         setBookContract(bookContractInstance);
 
-        const lastBorrowIndex =
-          Object.keys(BorrowManagerArtifact.networks).length - 1;
-        const borrowNetworkId = Object.keys(BorrowManagerArtifact.networks)[
-          lastBorrowIndex
-        ];
-        const borrowNetworkData =
-          BorrowManagerArtifact.networks[borrowNetworkId];
-
-        if (!borrowNetworkData?.address)
-          return console.error("BorrowManager not deployed");
-
         const borrowContractInstance = new ethers.Contract(
-          borrowNetworkData.address,
+          BorrowAddress,
           BorrowManagerArtifact.abi,
           wallet
         );
