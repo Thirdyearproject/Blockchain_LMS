@@ -1,17 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import Navbar from "../Dashboard/Navbar";
 
 function AdminDashboard({ setPrivateKey }) {
   const { user } = useSelector((state) => state.auth);
+  const [privateKeyInput, setPrivateKeyInput] = useState("");
 
   const handlePrivateKeyChange = (event) => {
-    setPrivateKey(event.target.value);
+    setPrivateKeyInput(event.target.value);
   };
-  let privateKey = "";
 
   const handlePrivateKeySubmit = () => {
-    if (privateKey) {
+    if (privateKeyInput.trim()) {
+      setPrivateKey(privateKeyInput);
       alert("Private Key set successfully.");
     } else {
       alert("Please enter a valid private key.");
@@ -39,7 +40,7 @@ function AdminDashboard({ setPrivateKey }) {
           type="text"
           className="border p-2 w-full rounded"
           placeholder="Enter your private key"
-          value={privateKey}
+          value={privateKeyInput}
           onChange={handlePrivateKeyChange}
         />
         <button

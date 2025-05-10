@@ -47,34 +47,62 @@ function UpdateClearance({ privateKey }) {
   };
 
   return (
-    <div className="p-4">
-      <h3 className="text-2xl font-semibold mb-4">Update Clearance Level</h3>
+    <div className="p-8 max-w-3xl mx-auto bg-white rounded-lg shadow-xl">
+      <h3 className="text-4xl font-semibold mb-6 text-center text-blue-600">
+        Update Clearance Level
+      </h3>
 
-      <input
-        type="text"
-        placeholder="User Address"
-        value={userAddress}
-        onChange={(e) => setUserAddress(e.target.value)}
-        className="border p-2 mb-2 w-full"
-      />
+      <div className="mb-4">
+        <label
+          htmlFor="userAddress"
+          className="block text-gray-700 text-sm font-medium mb-2"
+        >
+          User Address
+        </label>
+        <input
+          id="userAddress"
+          type="text"
+          placeholder="0x..."
+          value={userAddress}
+          onChange={(e) => setUserAddress(e.target.value)}
+          className="border border-gray-300 rounded-lg p-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
 
-      <input
-        type="number"
-        min="0"
-        max="3"
-        value={newLevel}
-        onChange={(e) => setNewLevel(e.target.value)}
-        className="border p-2 mb-2 w-full"
-      />
+      <div className="mb-6">
+        <label
+          htmlFor="clearanceLevel"
+          className="block text-gray-700 text-sm font-medium mb-2"
+        >
+          New Clearance Level
+        </label>
+        <input
+          id="clearanceLevel"
+          type="number"
+          min="0"
+          max="3"
+          value={newLevel}
+          onChange={(e) => setNewLevel(e.target.value)}
+          className="border border-gray-300 rounded-lg p-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
 
       <button
         onClick={updateClearance}
-        className="bg-blue-600 text-white px-4 py-2 rounded"
+        className="bg-blue-600 text-white px-8 py-4 w-full rounded-lg transition duration-300 hover:bg-blue-700 focus:outline-none"
       >
         Update
       </button>
 
-      {message && <p className="mt-3">{message}</p>}
+      {message && (
+        <p
+          className={`mt-4 text-center text-lg ${
+            message.includes("✅") ? "text-green-600" : "text-red-600"
+          }`}
+        >
+          {message}
+        </p>
+      )}
     </div>
   );
 }

@@ -24,22 +24,26 @@ contract BorrowManager {
         bookManager = BookManager(_bookManager);
     }
 
-    function borrowBook(uint _bookId) external {
+    function borrowBook(uint _bookId, address _user) public { 
         BookManager.Book memory book = bookManager.getBook(_bookId);
-        require(uint(userManager.getClearance(msg.sender)) >= book.requiredClearance, "Insufficient clearance");
+        
+        require(uint(userManager.getClearance(_user)) >= book.requiredClearance, "Insufficient clearance");
+        
         require(book.status == BookManager.Status.Approved, "Book not approved");
-        require(!hasBorrowed[msg.sender][_bookId], "Already borrowed");
-
+        
+        require(!hasBorrowed[_user][_bookId], "Already borrowed");
+    
         borrows.push(Borrow({
-            user: msg.sender,
+            user: _user,  
             bookId: _bookId,
-            borrowTime: block.timestamp,
-            returnTime: 0,
-            returned: false
+            borrowTime: block.timestamp,  
+            returnTime: 0,  
+            returned: false  
         }));
-
-        hasBorrowed[msg.sender][_bookId] = true;
+    
+        hasBorrowed[_user][_bookId] = true;
     }
+
 
     function returnBook(uint _borrowId) external {
         require(_borrowId < borrows.length, "Invalid borrow ID");

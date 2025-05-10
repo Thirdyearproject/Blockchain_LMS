@@ -11,10 +11,8 @@ const BookUpload = ({ account, privateKey }) => {
 
   const lastIndex = Object.keys(Upload.networks).length - 1;
   const networkId = Object.keys(Upload.networks)[lastIndex];
-  console.log("Connected networkId:", networkId);
 
   const networkData = Upload.networks[networkId];
-
   if (!networkData || !networkData.address) {
     console.error(`Contract not deployed on network ${networkId}`);
     throw new Error(`Contract not deployed on network ${networkId}`);
@@ -26,7 +24,6 @@ const BookUpload = ({ account, privateKey }) => {
   const [fileName, setFileName] = useState("No file selected");
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
-  const [clearance, setClearance] = useState(0); // <--- you already have this
   const [fileType, setFileType] = useState("PDF");
   const [loading, setLoading] = useState(false);
   const [filePreviewUrl, setFilePreviewUrl] = useState(null);
@@ -73,19 +70,14 @@ const BookUpload = ({ account, privateKey }) => {
         );
 
         const ipfsHash = resFile.data.IpfsHash;
-        console.log(
-          "Uploaded file URL:",
-          `https://gateway.pinata.cloud/ipfs/${ipfsHash}`
-        );
 
         const bookId = keccak256(toUtf8Bytes(title + author));
-
         const transaction = await contract.addBook(
           bookId,
           title,
           author,
-          ipfsHash,
-          clearance, // 👈 REQUIRED CLEARANCE added
+          ipfsHash, // Use the IPFS hash
+          0,
           FILE_TYPE_ENUM[fileType]
         );
         await transaction.wait();
@@ -109,7 +101,6 @@ const BookUpload = ({ account, privateKey }) => {
     setFilePreviewUrl(null);
     setTitle("");
     setAuthor("");
-    setClearance(0);
     setFileType("PDF");
   };
 
@@ -125,136 +116,105 @@ const BookUpload = ({ account, privateKey }) => {
   const renderPreview = () => {
     if (!file || !filePreviewUrl) return null;
 
-    switch (fileType) {
-      case "IMAGE":
-        return (
+    return (
+      <div className="w-full h-96 border rounded-md overflow-hidden mb-4 flex items-center justify-center bg-gray-100">
+        {fileType === "PDF" ? (
+          <object
+            data={filePreviewUrl}
+            type="application/pdf"
+            className="w-full h-full"
+            aria-label="PDF Preview"
+          >
+            <p className="text-gray-600">
+              PDF preview not available. <br />
+              Please download to view.
+            </p>
+          </object>
+        ) : fileType === "IMAGE" ? (
           <img
             src={filePreviewUrl}
-            alt="Book preview"
-            className="max-h-48 rounded-md border border-gray-300 object-contain mb-4"
+            alt="preview"
+            className="object-contain h-full"
           />
-        );
-      case "PDF":
-        return (
-          <embed
-            src={filePreviewUrl}
-            type="application/pdf"
-            className="w-full h-48 rounded-md border border-gray-300 mb-4"
-          />
-        );
-      case "VIDEO":
-        return (
+        ) : fileType === "VIDEO" ? (
           <video
             src={filePreviewUrl}
             controls
-            className="w-full h-48 rounded-md border border-gray-300 object-contain mb-4"
+            className="w-full h-full object-contain"
           />
-        );
-      default:
-        return (
-          <div className="p-2 bg-gray-100 rounded-md border border-gray-300 text-center text-sm text-gray-700 mb-4">
+        ) : (
+          <div className="p-4 text-gray-600 text-center">
             <p>
-              Selected File: <strong>{fileName}</strong>
+              <strong>{fileName}</strong>
             </p>
             <p>Type: {fileType}</p>
             <p>Size: {(file.size / 1024).toFixed(2)} KB</p>
           </div>
-        );
-    }
+        )}
+      </div>
+    );
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6 mt-10">
-      <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-8">
-        <div className="flex flex-col items-center md:items-start md:w-1/3">
-          {renderPreview()}
-          <label
-            htmlFor="file-upload"
-            className="inline-block cursor-pointer select-none bg-gradient-to-r from-blue-300 to-blue-400 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:from-blue-400 hover:to-blue-500 transition-colors duration-300 ease-in-out w-full text-center mb-2"
-          >
-            Choose Book File
-          </label>
+    <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-xl p-8 mt-10 space-y-8">
+      <h2 className="text-2xl font-bold text-center text-blue-600">
+        Upload New Book
+      </h2>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {renderPreview()}
+
+        <div className="space-y-4">
           <input
             disabled={!account}
             type="file"
             id="file-upload"
             name="data"
             onChange={retrieveFile}
-            className="hidden"
+            className="block w-full text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
           />
-          <p className="text-sm italic text-gray-500 text-center md:text-left break-all w-full mb-6">
+          <p className="text-sm italic text-gray-500 break-words">
             File: {fileName}
           </p>
         </div>
 
-        <div className="flex flex-col md:w-2/3 space-y-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label
-              htmlFor="title"
-              className="block mb-1 font-semibold text-gray-700"
-            >
+            <label className="block mb-1 font-semibold text-gray-700">
               Book Title
             </label>
             <input
-              id="title"
               type="text"
-              placeholder="Book Title"
+              placeholder="Enter book title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
-              className="block w-full rounded-md border border-gray-300 py-2 px-3 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 focus:outline-none focus:ring-1"
+              className="block w-full rounded-md border-gray-300 py-2 px-3 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:outline-none"
             />
           </div>
 
           <div>
-            <label
-              htmlFor="author"
-              className="block mb-1 font-semibold text-gray-700"
-            >
+            <label className="block mb-1 font-semibold text-gray-700">
               Author
             </label>
             <input
-              id="author"
               type="text"
-              placeholder="Author"
+              placeholder="Enter author name"
               value={author}
               onChange={(e) => setAuthor(e.target.value)}
               required
-              className="block w-full rounded-md border border-gray-300 py-2 px-3 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 focus:outline-none focus:ring-1"
+              className="block w-full rounded-md border-gray-300 py-2 px-3 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:outline-none"
             />
           </div>
 
           <div>
-            <label
-              htmlFor="clearance"
-              className="block mb-1 font-semibold text-gray-700"
-            >
-              Required Clearance Level
-            </label>
-            <input
-              id="clearance"
-              type="number"
-              min="0"
-              value={clearance}
-              onChange={(e) => setClearance(Number(e.target.value))}
-              required
-              className="block w-full rounded-md border border-gray-300 py-2 px-3 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 focus:outline-none focus:ring-1"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="fileType"
-              className="block mb-1 font-semibold text-gray-700"
-            >
-              Book Type
+            <label className="block mb-1 font-semibold text-gray-700">
+              File Type
             </label>
             <select
-              id="fileType"
               value={fileType}
               onChange={(e) => setFileType(e.target.value)}
               required
-              className="block w-full rounded-md border border-gray-300 py-2 px-3 bg-white text-gray-900 focus:border-blue-500 focus:ring-blue-500 focus:outline-none focus:ring-1"
+              className="block w-full rounded-md border-gray-300 py-2 px-3 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:outline-none"
             >
               <option value="PDF">PDF</option>
               <option value="EPUB">EPUB</option>
@@ -264,19 +224,19 @@ const BookUpload = ({ account, privateKey }) => {
               <option value="VIDEO">VIDEO</option>
             </select>
           </div>
-
-          <button
-            type="submit"
-            disabled={!file || loading}
-            className={`w-full py-3 rounded-lg text-white font-semibold text-lg transition-colors duration-300 ease-in-out shadow-md ${
-              loading || !file
-                ? "bg-blue-300 cursor-not-allowed"
-                : "bg-blue-400 hover:bg-blue-500 active:bg-blue-600 cursor-pointer"
-            }`}
-          >
-            {loading ? "Uploading..." : "Upload Book"}
-          </button>
         </div>
+
+        <button
+          type="submit"
+          disabled={!file || loading}
+          className={`w-full py-3 rounded-md text-white font-semibold transition duration-300 ${
+            loading || !file
+              ? "bg-blue-300 cursor-not-allowed"
+              : "bg-blue-500 hover:bg-blue-600"
+          }`}
+        >
+          {loading ? "Uploading..." : "Upload Book"}
+        </button>
       </form>
     </div>
   );

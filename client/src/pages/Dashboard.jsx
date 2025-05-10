@@ -31,39 +31,39 @@ function Dashboard() {
   };
 
   return (
-    <div className="relative h-fit">
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Sidebar */}
       <div
         className={`${
-          isOpen ? "w-[200px]" : "w-[70px]"
-        } h-[100vh] fixed top-0 left-0 z-20 flex flex-col ${
-          isOpen ? "" : "items-center"
-        } bg-white transition-all duration-300 ease-out`}
+          isOpen ? "w-60" : "w-20"
+        } h-full fixed top-0 left-0 z-20 flex flex-col bg-white shadow-md transition-all duration-300`}
       >
-        {/* Sidebar Links */}
-        <div className="flex flex-col gap-4 mt-16">
+        <div className="flex flex-col gap-6 mt-20">
           {getSidebarLinks().map((link, index) => (
             <SidebarLink
+              key={index}
+              link={link}
               isOpen={isOpen}
               setIsOpen={setIsOpen}
-              link={link}
-              key={index}
             />
           ))}
         </div>
 
-        {/* Sidebar Toggle Button */}
+        {/* Toggle button */}
         <div
           onClick={() => setIsOpen(!isOpen)}
-          className={`flex cursor-pointer items-center justify-center text-[#1ea9f2] absolute bottom-10 ${
-            isOpen ? "right-[-9%]" : "right-[-22%]"
-          } bg-[#dceafd] p-2 rounded-full`}
+          className="flex items-center justify-center cursor-pointer text-blue-500 absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-blue-100 p-2 rounded-full shadow-md"
         >
           {isOpen ? <MdArrowBackIos className="pl-1" /> : <MdArrowForwardIos />}
         </div>
       </div>
 
-      {/* Main Outlet */}
-      <div className="h-full flex transition-all duration-300 ml-[70px]">
+      {/* Main Content */}
+      <div
+        className={`flex-1 ml-20 transition-all duration-300 ${
+          isOpen ? "ml-60" : "ml-20"
+        } p-6`}
+      >
         <Outlet />
       </div>
     </div>

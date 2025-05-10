@@ -80,7 +80,8 @@ contract BookManager {
         return books;
     }
 
-    function getBooksCount() external view returns (uint) {
+    function getBooksCount() public view returns (uint) {
         return books.length;
     }
+
 }

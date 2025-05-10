@@ -83,20 +83,21 @@ export default function RegisterUser({ privateKey }) {
   };
 
   return (
-    <div className="flex bg-[#f9fafa] min-h-screen">
-      <div className="w-full flex flex-col items-center justify-center">
-        <div className="md:w-[60%] w-full p-4">
-          <button
-            onClick={handleRegisterAll}
-            disabled={isLoading}
-            className="mt-6 px-5 py-3 bg-indigo-600 text-white rounded disabled:opacity-50"
-          >
-            {isLoading ? "Registering…" : "Register All Accounts"}
-          </button>
-
-          {isLoading && <div className="mt-3 text-gray-600">Loading…</div>}
-        </div>
+    <div className="flex bg-[#f9fafa] min-h-screen w-screen">
+    <div className="flex flex-1 flex-col items-center justify-center">
+      <div className="w-full max-w-3xl p-4">
+        <button
+          onClick={handleRegisterAll}
+          disabled={isLoading}
+          className="mt-6 w-full px-5 py-3 bg-indigo-600 text-white rounded disabled:opacity-50"
+        >
+          {isLoading ? "Registering…" : "Register All Accounts"}
+        </button>
+  
+        {isLoading && <div className="mt-3 text-gray-600">Loading…</div>}
       </div>
     </div>
+  </div>
+  
   );
 }
