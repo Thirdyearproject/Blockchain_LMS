@@ -59,6 +59,12 @@ export const studentSidebarLinks = [
     path: "/dashboard/my-dashboard/books",
     icon: MdMenuBook,
   },
+  {
+    id: 2,
+    name: "Vote on Books",
+    path: "/dashboard/my-dashboard/vote-books",
+    icon: MdHowToVote,
+  },
 ];
 
 export const teacherSidebarLinks = [
@@ -94,11 +100,5 @@ export const guestSidebarLinks = [
     name: "Home",
     path: "/dashboard/my-dashboard",
     icon: MdOutlineDashboard,
-  },
-  {
-    id: 1,
-    name: "Book Upload",
-    path: "/dashboard/my-dashboard/upload",
-    icon: MdUploadFile,
   },
 ];

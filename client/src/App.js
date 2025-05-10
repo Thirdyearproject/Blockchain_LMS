@@ -31,38 +31,30 @@ function App() {
       case 1:
         return <GuestDashboard />;
       case 2:
-        return <StudentDashboard />;
+        return (
+          <StudentDashboard
+            privateKey={privateKey}
+            setPrivateKey={setPrivateKey}
+          />
+        );
       case 3:
-        return <TeacherDashboard />;
+        return (
+          <TeacherDashboard
+            privateKey={privateKey}
+            setPrivateKey={setPrivateKey}
+          />
+        );
       case 4:
-        return <AdminDashboard />;
+        return (
+          <AdminDashboard
+            privateKey={privateKey}
+            setPrivateKey={setPrivateKey}
+          />
+        );
       default:
         return <Navigate to="/login" replace />;
     }
   };
-
-  // If user is trying to access /dashboard and no privateKey, ask for it first
-  if (location.pathname.startsWith("/dashboard") && !privateKey) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-        <h1 className="text-2xl font-semibold mb-6">Enter your Private Key</h1>
-        <input
-          type="password"
-          value={privateKeyInput}
-          onChange={(e) => setPrivateKeyInput(e.target.value)}
-          placeholder="Private Key"
-          className="border border-gray-400 px-4 py-2 rounded-md mb-4 w-80"
-        />
-        <button
-          onClick={() => setPrivateKey(privateKeyInput)}
-          className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition"
-          disabled={!privateKeyInput.trim()}
-        >
-          Submit
-        </button>
-      </div>
-    );
-  }
 
   return (
     <Routes>

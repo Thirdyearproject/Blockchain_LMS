@@ -78,10 +78,6 @@ function Login() {
       setAuthError("User not registered. Please contact admin.");
       return;
     }
-    if (userClearanceLevel == 0) {
-      setAuthError("User not registered. Please contact admin.");
-      return;
-    }
 
     const dummyToken = "dummy-token";
 

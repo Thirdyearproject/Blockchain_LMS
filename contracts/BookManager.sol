@@ -36,7 +36,7 @@ contract BookManager {
         uint _requiredClearance,
         uint _fileType
     ) external {
-        require(uint(userManager.getClearance(msg.sender)) >= 2, "Not enough clearance to add books");
+        require(uint(userManager.getClearance(msg.sender)) > 2, "Not enough clearance to add books");
         books.push(Book(
             _bookId,
             _title,
@@ -52,7 +52,7 @@ contract BookManager {
     }
 
     function voteOnBook(uint _bookId, bool _approve) external {
-        require(uint(userManager.getClearance(msg.sender)) > 0, "Not enough clearance to vote");
+        require(uint(userManager.getClearance(msg.sender)) > 1, "Not enough clearance to vote");
         require(!voted[_bookId][msg.sender], "Already voted on this book");
         require(_bookId < books.length, "Invalid book ID");
 
