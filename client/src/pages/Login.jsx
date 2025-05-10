@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { ethers } from "ethers";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setToken, setUser, setType } from "../redux/Slices/authSlice";
+import { RPC_URL } from "../services/apis";
+import UserManagerABI from "../build/contracts/UserManager.json";
 
 function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const signupData = useSelector((state) => state.auth.signupData);
   const [walletAddress, setWalletAddress] = useState("");
   const [authError, setAuthError] = useState("");
 
@@ -17,27 +18,72 @@ function Login() {
       return;
     }
 
-    if (!signupData || !Array.isArray(signupData)) {
-      setAuthError("No registered accounts found. Please sign up first.");
+    const provider = new ethers.JsonRpcProvider(RPC_URL);
+
+    const lastIndex = Object.keys(UserManagerABI.networks).length - 1;
+    const networkId = Object.keys(UserManagerABI.networks)[lastIndex];
+
+    const networkData = UserManagerABI.networks[networkId];
+    if (!networkData || !networkData.address) {
+      console.error(`Contract not deployed on network ${networkId}`);
       return;
     }
 
-    const user = signupData.find((u) => u.userAddr.address === address);
+    const userManager = new ethers.Contract(
+      networkData.address,
+      UserManagerABI.abi,
+      provider
+    );
 
-    if (user) {
-      const dummyToken = "dummy-token"; // simple dummy token
+    let adminAddress;
+    try {
+      adminAddress = await userManager.admin();
+    } catch (error) {
+      console.error("Error fetching admin address:", error);
+      setAuthError("Could not fetch admin address.");
+      return;
+    }
+
+    if (address.toLowerCase() === adminAddress.toLowerCase()) {
+      const dummyToken = "dummy-token";
       localStorage.setItem("lmstoken", JSON.stringify(dummyToken));
-      localStorage.setItem("lmsuser", JSON.stringify(user.userAddr.address));
-      localStorage.setItem("type", JSON.stringify(user.clearanceLevel));
+      localStorage.setItem("lmsuser", JSON.stringify(address));
+      localStorage.setItem("type", JSON.stringify(4)); // Admin type
 
       dispatch(setToken(dummyToken));
-      dispatch(setUser(user.userAddr.address));
-      dispatch(setType(user.clearanceLevel));
+      dispatch(setUser(address));
+      dispatch(setType(4));
 
       navigate("/dashboard");
-    } else {
-      setAuthError("Wallet address not registered. Please sign up first.");
+      return;
     }
+
+    // Check user clearance
+    let clearanceLevel;
+    try {
+      clearanceLevel = await userManager.getClearance(address);
+      console.log("Clearance Level:", clearanceLevel);
+    } catch (error) {
+      console.error("Error fetching clearance level:", error);
+      setAuthError("Failed to fetch clearance level.");
+      return;
+    }
+
+    if (clearanceLevel === 0n) {
+      setAuthError("User not registered. Please contact admin.");
+      return;
+    }
+
+    const dummyToken = "dummy-token";
+    localStorage.setItem("lmstoken", JSON.stringify(dummyToken));
+    localStorage.setItem("lmsuser", JSON.stringify(address));
+    localStorage.setItem("type", JSON.stringify(Number(clearanceLevel)));
+
+    dispatch(setToken(dummyToken));
+    dispatch(setUser(address));
+    dispatch(setType(Number(clearanceLevel)));
+
+    navigate("/dashboard");
   };
 
   const handleWalletLogin = async () => {
@@ -108,18 +154,6 @@ function Login() {
                       6
                     )}...${walletAddress.slice(-4)}`
                   : "Login with MetaMask"}
-              </button>
-            </div>
-
-            <div className="flex justify-between items-center mt-6">
-              <p className="font-semibold text-[14px] text-gray-500">
-                Don't have an account?
-              </p>
-              <button
-                onClick={() => navigate("/signup")}
-                className="underline text-sm text-[#22a7f1] font-bold"
-              >
-                Sign Up
               </button>
             </div>
           </div>

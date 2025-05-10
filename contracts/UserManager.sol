@@ -4,7 +4,7 @@ pragma solidity ^0.8.19;
 contract UserManager {
     address public admin;
 
-    enum Clearance { None, Level1, Level2, Level3 }
+    enum Clearance { None, Level1, Level2, Level3, Level4 }
 
     mapping(address => Clearance) public userClearance;
 

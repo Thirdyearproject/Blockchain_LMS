@@ -3,7 +3,6 @@ import { Route, Routes, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import Login from "./pages/Login";
-import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 
 import OpenRoute from "./components/Auth/OpenRoute";
@@ -19,13 +18,13 @@ function App() {
 
   const renderDashboard = () => {
     switch (type) {
-      case 0:
-        return <GuestDashboard />;
       case 1:
-        return <StudentDashboard />;
+        return <GuestDashboard />;
       case 2:
-        return <TeacherDashboard />;
+        return <StudentDashboard />;
       case 3:
+        return <TeacherDashboard />;
+      case 4:
         return <AdminDashboard />;
       default:
         return <Navigate to="/login" replace />;
@@ -41,15 +40,6 @@ function App() {
         element={
           <OpenRoute>
             <Login />
-          </OpenRoute>
-        }
-      />
-
-      <Route
-        path="/signup"
-        element={
-          <OpenRoute>
-            <Signup />
           </OpenRoute>
         }
       />

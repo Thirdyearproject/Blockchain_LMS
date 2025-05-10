@@ -7,3 +7,7 @@ client/src/build/contracts/BookManager.json
 client/src/build/contracts/BorrowManager.json
 client/src/build/contracts/Migrations.json
 client/src/build/contracts/UserManager.json
+client/src/build/contracts/BookManager.json
+client/src/build/contracts/BorrowManager.json
+client/src/build/contracts/Migrations.json
+client/src/build/contracts/UserManager.json
