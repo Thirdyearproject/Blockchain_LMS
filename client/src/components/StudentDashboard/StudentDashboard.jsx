@@ -1,75 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 import Navbar from "../Dashboard/Navbar";
-import Books from "../Books";
 
 function StudentDashboard() {
   const { user } = useSelector((state) => state.auth);
 
-  const [errorMessage, setErrorMessage] = useState("");
-  const [privateKey, setPrivateKey] = useState(null);
-
-  const renderErrorMessage = () =>
-    errorMessage && (
-      <div className="error-banner">
-        {errorMessage}
-        <button onClick={() => setErrorMessage("")}>✕</button>
-      </div>
-    );
-
-  const renderDashboardContent = () => {
-    if (!privateKey) {
-      return (
-        <p className="text-red-500 font-semibold">
-          Please provide your private key to continue.
-        </p>
-      );
-    }
-
-    return (
-      <div>
-        <Books account={user} privateKey={privateKey} />
-      </div>
-    );
-  };
-
-  const initializeWalletConnection = async () => {
-    try {
-      const inputPrivateKey = prompt("Please enter your private key:");
-      if (!inputPrivateKey) {
-        setErrorMessage("Private key is required.");
-        return;
-      }
-      setPrivateKey(inputPrivateKey);
-    } catch (error) {
-      setErrorMessage("Failed to initialize wallet connection.");
-      console.error("Error initializing wallet:", error);
-    }
-  };
-
-  useEffect(() => {
-    initializeWalletConnection();
-  }, [user]);
-
   return (
-    <div className="flex flex-col bg-gray-100 w-full p-4">
-      <div className="w-full">
-        <Navbar name="My Dashboard" />
+    <div className="flex-1 p-6 w-full max-w-[1600px] mx-auto flex flex-col gap-8">
+      {/* Navbar */}
+      <Navbar name="Student Dashboard" />
+
+      {/* Account Info */}
+      <div className="bg-white p-4 rounded shadow-md">
+        <p className="text-gray-700 font-semibold break-words">
+          Account: {user}
+        </p>
       </div>
 
-      {renderErrorMessage()}
-
-      <div className="bg rounded-lg shadow-md p-4 max-w-full max-w-lg mx-0 mb-6">
-        {user && (
-          <p className="text-gray-800 font-semibold text-base text-left">
-            <span className="text-gray-500 font-normal mr-2">Account:</span>
-            {user}
-          </p>
-        )}
-        <hr className="mt-3 border-t border-gray-300" />
+      {/* Instructions */}
+      <div className="text-gray-600">
+        Please select an option from the sidebar to continue.
       </div>
-
-      {renderDashboardContent()}
     </div>
   );
 }
