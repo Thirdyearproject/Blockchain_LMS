@@ -6,59 +6,67 @@ import { ethers } from "ethers";
 import UserManagerABI from "../build/contracts/UserManager.json";
 import { RPC_URL, UserAddress } from "../services/apis";
 
-export default function RegisterUser({ privateKey }) {
+export default function RegisterUser() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
 
+  // Helper function to determine clearance level
+  const getClearanceLevel = (index) => {
+    if (index === 0) return 4; // Admin
+    if ([1, 2, 3].includes(index)) return 3; // Teacher
+    if ([8, 9].includes(index)) return 1; // Guest
+    return 2; // Student
+  };
+
   const handleRegisterAll = async () => {
     setIsLoading(true);
     try {
-      const provider = new ethers.JsonRpcProvider(RPC_URL);
-      const wallet = new ethers.Wallet(privateKey, provider);
+      if (!window.ethereum) {
+        alert("Please install MetaMask!");
+        return;
+      }
 
+      // Connect to MetaMask
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      const signer = await provider.getSigner();
       const contract = new ethers.Contract(
         UserAddress,
         UserManagerABI.abi,
-        wallet
+        signer
       );
 
-      const addresses = await provider.listAccounts();
-      let registeredAccounts = [];
+      let registeredAccounts = []; // Store registered accounts
+      let currentNonce = await provider.getTransactionCount(
+        await signer.getAddress()
+      );
 
-      let currentNonce = await provider.getTransactionCount(wallet.address);
+      for (let i = 0; i < accounts.length; i++) {
+        const userAddr = accounts[i];
+        const clearanceLevel = getClearanceLevel(i);
 
-      for (let i = 0; i < addresses.length; i++) {
-        const userAddr = addresses[i];
-        let clearanceLevel;
+        try {
+          const tx = await contract.setClearance(userAddr, clearanceLevel, {
+            nonce: currentNonce,
+          });
+          currentNonce += 1;
+          await tx.wait(); // Wait for transaction confirmation
 
-        if (i === 0) {
-          clearanceLevel = 4; // Admin
-        } else if (i === 1 || i === 2 || i === 3) {
-          clearanceLevel = 3; // Teacher
-        } else if (i === 8 || i === 9) {
-          clearanceLevel = 1; // Guest
-        } else {
-          clearanceLevel = 2; // Student
+          const clear = await contract.getClearance(userAddr);
+          console.log(
+            `✅ ${userAddr} registered with Clearance Level ${clear.toString()}`
+          );
+
+          registeredAccounts.push(userAddr); // Add registered address to the list
+        } catch (txError) {
+          console.error(`❌ Error registering ${userAddr}:`, txError);
         }
-
-        const tx = await contract.setClearance(userAddr, clearanceLevel, {
-          nonce: currentNonce,
-        });
-        currentNonce += 1;
-        await tx.wait();
-
-        const clear = await contract.getClearance(userAddr);
-        console.log(
-          `✅ ${userAddr} registered with Clearance Level ${clear.toString()}`
-        );
       }
 
       dispatch(setSignup(true));
-      localStorage.setItem(
-        "registeredAccounts",
-        JSON.stringify(registeredAccounts)
-      );
 
       alert("🎉 Accounts registered successfully!");
     } catch (error) {

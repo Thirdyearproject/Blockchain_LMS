@@ -7,6 +7,54 @@
       "type": "constructor"
     },
     {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "EtherReceived",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "data",
+          "type": "bytes"
+        }
+      ],
+      "name": "FallbackCalled",
+      "type": "event"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "fallback"
+    },
+    {
       "inputs": [],
       "name": "admin",
       "outputs": [
@@ -17,18 +65,17 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
         {
           "internalType": "address",
-          "name": "",
+          "name": "_user",
           "type": "address"
         }
       ],
-      "name": "userClearance",
+      "name": "getClearance",
       "outputs": [
         {
           "internalType": "enum UserManager.Clearance",
@@ -37,8 +84,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -61,12 +107,25 @@
     {
       "inputs": [
         {
+          "internalType": "enum UserManager.Clearance",
+          "name": "_level",
+          "type": "uint8"
+        }
+      ],
+      "name": "upgradeClearance",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "address",
-          "name": "_user",
+          "name": "",
           "type": "address"
         }
       ],
-      "name": "getClearance",
+      "name": "userClearance",
       "outputs": [
         {
           "internalType": "enum UserManager.Clearance",
@@ -75,8 +134,11 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.8.19+commit.7dd6d404\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"admin\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_user\",\"type\":\"address\"}],\"name\":\"getClearance\",\"outputs\":[{\"internalType\":\"enum UserManager.Clearance\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_user\",\"type\":\"address\"},{\"internalType\":\"enum UserManager.Clearance\",\"name\":\"_level\",\"type\":\"uint8\"}],\"name\":\"setClearance\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"userClearance\",\"outputs\":[{\"internalType\":\"enum UserManager.Clearance\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/UserManager.sol\":\"UserManager\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/UserManager.sol\":{\"keccak256\":\"0x437c9e76b4ee26d0dce69d52b0516d01710b4799a8b5170499096c24ca91be0c\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://1958809ff44a8848b58c1e42e440c3ee8d6bbb1f7927be50c289c5025919bf80\",\"dweb:/ipfs/QmSG5YGqQh9mdhn8Dfo5tLom36PHMxFgG6nMSFeLhLtgYm\"]}},\"version\":1}",
@@ -2217,9 +2279,7 @@
   "ast": {
     "absolutePath": "project:/contracts/UserManager.sol",
     "exportedSymbols": {
-      "UserManager": [
-        555
-      ]
+      "UserManager": [555]
     },
     "id": 556,
     "license": "MIT",
@@ -2227,12 +2287,7 @@
     "nodes": [
       {
         "id": 490,
-        "literals": [
-          "solidity",
-          "^",
-          "0.8",
-          ".19"
-        ],
+        "literals": ["solidity", "^", "0.8", ".19"],
         "nodeType": "PragmaDirective",
         "src": "33:24:3"
       },
@@ -2244,9 +2299,7 @@
         "contractKind": "contract",
         "fullyImplemented": true,
         "id": 555,
-        "linearizedBaseContracts": [
-          555
-        ],
+        "linearizedBaseContracts": [555],
         "name": "UserManager",
         "nameLocation": "70:11:3",
         "nodeType": "ContractDefinition",
@@ -2369,9 +2422,7 @@
                 "pathNode": {
                   "id": 500,
                   "name": "Clearance",
-                  "nameLocations": [
-                    "200:9:3"
-                  ],
+                  "nameLocations": ["200:9:3"],
                   "nodeType": "IdentifierPath",
                   "referencedDeclaration": 498,
                   "src": "200:9:3"
@@ -2574,10 +2625,7 @@
                       "id": 514,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        4294967278,
-                        4294967278
-                      ],
+                      "overloadedDeclarations": [4294967278, 4294967278],
                       "referencedDeclaration": 4294967278,
                       "src": "331:7:3",
                       "typeDescriptions": {
@@ -2713,9 +2761,7 @@
                 "modifierName": {
                   "id": 531,
                   "name": "onlyAdmin",
-                  "nameLocations": [
-                    "489:9:3"
-                  ],
+                  "nameLocations": ["489:9:3"],
                   "nodeType": "IdentifierPath",
                   "referencedDeclaration": 524,
                   "src": "489:9:3"
@@ -2780,9 +2826,7 @@
                     "pathNode": {
                       "id": 527,
                       "name": "Clearance",
-                      "nameLocations": [
-                        "462:9:3"
-                      ],
+                      "nameLocations": ["462:9:3"],
                       "nodeType": "IdentifierPath",
                       "referencedDeclaration": 498,
                       "src": "462:9:3"
@@ -2930,9 +2974,7 @@
                     "pathNode": {
                       "id": 545,
                       "name": "Clearance",
-                      "nameLocations": [
-                        "615:9:3"
-                      ],
+                      "nameLocations": ["615:9:3"],
                       "nodeType": "IdentifierPath",
                       "referencedDeclaration": 498,
                       "src": "615:9:3"

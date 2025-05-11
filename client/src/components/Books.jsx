@@ -4,31 +4,40 @@ import BookManagerArtifact from "../build/contracts/BookManager.json";
 import BorrowManagerArtifact from "../build/contracts/BorrowManager.json";
 import { RPC_URL, BookAddress, BorrowAddress } from "../services/apis";
 
-const Books = ({ account, privateKey }) => {
+const Books = () => {
   const [allBooks, setAllBooks] = useState([]);
   const [availableBooks, setAvailableBooks] = useState([]);
   const [borrowedBooks, setBorrowedBooks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [bookContract, setBookContract] = useState(null);
   const [borrowContract, setBorrowContract] = useState(null);
+  const [account, setAccount] = useState(""); // Add state to store current account
 
   useEffect(() => {
     const setupContracts = async () => {
       try {
-        const provider = new ethers.JsonRpcProvider(RPC_URL);
-        const wallet = new ethers.Wallet(privateKey, provider);
+        if (!window.ethereum) {
+          console.error("Please install MetaMask!");
+          return;
+        }
+
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        const signer = await provider.getSigner();
+
+        setAccount(signer.address); // Set the current account
 
         const bookContractInstance = new ethers.Contract(
           BookAddress,
           BookManagerArtifact.abi,
-          wallet
+          signer
         );
         setBookContract(bookContractInstance);
 
         const borrowContractInstance = new ethers.Contract(
           BorrowAddress,
           BorrowManagerArtifact.abi,
-          wallet
+          signer
         );
         setBorrowContract(borrowContractInstance);
       } catch (error) {
@@ -37,11 +46,13 @@ const Books = ({ account, privateKey }) => {
     };
 
     setupContracts();
-  }, [privateKey]); // Ensure this runs whenever privateKey changes
+  }, []); // Empty dependency array to run setupContracts once
 
   const fetchBooks = async () => {
-    if (!bookContract || !borrowContract)
-      return console.error("Contracts not ready");
+    if (!bookContract || !borrowContract || !account) {
+      console.error("Contracts or account not ready");
+      return;
+    }
 
     setLoading(true);
     try {
@@ -71,7 +82,6 @@ const Books = ({ account, privateKey }) => {
             account,
             book.index
           );
-          console.log(alreadyBorrowed);
           alreadyBorrowed ? borrowed.push(book) : available.push(book);
         }
       }
@@ -87,13 +97,16 @@ const Books = ({ account, privateKey }) => {
   };
 
   const borrowBook = async (bookIndex) => {
-    if (!borrowContract) {
-      console.error("Borrow Contract not initialized");
+    if (!borrowContract || !account) {
+      console.error("Borrow Contract or account not initialized");
       return;
     }
     console.log(bookIndex);
+
     try {
-      const tx = await borrowContract.borrowBook(bookIndex, account);
+      const tx = await borrowContract.borrowBook(bookIndex, {
+        value: ethers.parseEther("0.01"),
+      });
       await tx.wait();
       alert("Book borrowed successfully!");
       await fetchBooks();
@@ -104,13 +117,15 @@ const Books = ({ account, privateKey }) => {
   };
 
   const returnBook = async (bookId) => {
-    if (!borrowContract) {
-      console.error("Borrow Contract not initialized");
+    if (!borrowContract || !account) {
+      console.error("Borrow Contract or account not initialized");
       return;
     }
+
     try {
       // Find the borrow record ID (`_borrowId`) for this user and book
       const borrows = await borrowContract.getAllBorrows();
+      console.log(borrows);
       const borrowId = borrows.findIndex(
         (b) =>
           b.user.toLowerCase() === account.toLowerCase() &&

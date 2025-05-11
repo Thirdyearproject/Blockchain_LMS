@@ -4,18 +4,66 @@
     {
       "inputs": [
         {
-          "internalType": "address",
+          "internalType": "address payable",
           "name": "_userManager",
           "type": "address"
         },
         {
-          "internalType": "address",
+          "internalType": "address payable",
           "name": "_bookManager",
           "type": "address"
         }
       ],
       "stateMutability": "nonpayable",
       "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "EtherReceived",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "data",
+          "type": "bytes"
+        }
+      ],
+      "name": "FallbackCalled",
+      "type": "event"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "fallback"
     },
     {
       "inputs": [],
@@ -28,8 +76,20 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_bookId",
+          "type": "uint256"
+        }
+      ],
+      "name": "borrowBook",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
     },
     {
       "inputs": [
@@ -39,7 +99,7 @@
           "type": "uint256"
         }
       ],
-      "name": "borrows",
+      "name": "borrowRecords",
       "outputs": [
         {
           "internalType": "address",
@@ -68,77 +128,6 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "name": "hasBorrowed",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [],
-      "name": "userManager",
-      "outputs": [
-        {
-          "internalType": "contract UserManager",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_bookId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
-          "name": "_user",
-          "type": "address"
-        }
-      ],
-      "name": "borrowBook",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_borrowId",
-          "type": "uint256"
-        }
-      ],
-      "name": "returnBook",
-      "outputs": [],
-      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -173,28 +162,67 @@
               "type": "bool"
             }
           ],
-          "internalType": "struct BorrowManager.Borrow[]",
+          "internalType": "struct BorrowManager.BorrowRecord[]",
           "name": "",
           "type": "tuple[]"
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
-      "inputs": [],
-      "name": "getBorrowsCount",
-      "outputs": [
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
         {
           "internalType": "uint256",
           "name": "",
           "type": "uint256"
         }
       ],
+      "name": "hasBorrowed",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_bookId",
+          "type": "uint256"
+        }
+      ],
+      "name": "returnBook",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "userManager",
+      "outputs": [
+        {
+          "internalType": "contract UserManager",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.8.19+commit.7dd6d404\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_userManager\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_bookManager\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"bookManager\",\"outputs\":[{\"internalType\":\"contract BookManager\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_bookId\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"_user\",\"type\":\"address\"}],\"name\":\"borrowBook\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"borrows\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"bookId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"borrowTime\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"returnTime\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"returned\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getAllBorrows\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"bookId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"borrowTime\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"returnTime\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"returned\",\"type\":\"bool\"}],\"internalType\":\"struct BorrowManager.Borrow[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getBorrowsCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"hasBorrowed\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_borrowId\",\"type\":\"uint256\"}],\"name\":\"returnBook\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"userManager\",\"outputs\":[{\"internalType\":\"contract UserManager\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/BorrowManager.sol\":\"BorrowManager\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/BookManager.sol\":{\"keccak256\":\"0x42d47a595e7d25c8159cc542a23c963e376afd68f04be0a158feb4b886b6e8e2\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://37ac3d0ef11a0126ebb726d25a002a6e54b48701408e6a65d71b5a9340397ec7\",\"dweb:/ipfs/QmPAMgNYfHLSjY4TV2AB7WRPTxoCv9fhiFHDPaTTq1XB2D\"]},\"project:/contracts/BorrowManager.sol\":{\"keccak256\":\"0xadcdbbd245d82169d4840de8417b15ab51cc1629fff7689876bb638cf22e52c0\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://958550cf1098acf5a1ae3298b36b48d417517aa46890d427dc8e3717a8a0788e\",\"dweb:/ipfs/QmZ8toFkah9MAFceFn2UvE9ztgL9Ft7htcvWZQE4mbEVcK\"]},\"project:/contracts/UserManager.sol\":{\"keccak256\":\"0x437c9e76b4ee26d0dce69d52b0516d01710b4799a8b5170499096c24ca91be0c\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://1958809ff44a8848b58c1e42e440c3ee8d6bbb1f7927be50c289c5025919bf80\",\"dweb:/ipfs/QmSG5YGqQh9mdhn8Dfo5tLom36PHMxFgG6nMSFeLhLtgYm\"]}},\"version\":1}",
@@ -11612,15 +11640,9 @@
   "ast": {
     "absolutePath": "project:/contracts/BorrowManager.sol",
     "exportedSymbols": {
-      "BookManager": [
-        257
-      ],
-      "BorrowManager": [
-        461
-      ],
-      "UserManager": [
-        555
-      ]
+      "BookManager": [257],
+      "BorrowManager": [461],
+      "UserManager": [555]
     },
     "id": 462,
     "license": "MIT",
@@ -11628,12 +11650,7 @@
     "nodes": [
       {
         "id": 259,
-        "literals": [
-          "solidity",
-          "^",
-          "0.8",
-          ".19"
-        ],
+        "literals": ["solidity", "^", "0.8", ".19"],
         "nodeType": "PragmaDirective",
         "src": "33:24:1"
       },
@@ -11669,9 +11686,7 @@
         "contractKind": "contract",
         "fullyImplemented": true,
         "id": 461,
-        "linearizedBaseContracts": [
-          461
-        ],
+        "linearizedBaseContracts": [461],
         "name": "BorrowManager",
         "nameLocation": "130:13:1",
         "nodeType": "ContractDefinition",
@@ -11847,9 +11862,7 @@
                 "pathNode": {
                   "id": 273,
                   "name": "Borrow",
-                  "nameLocations": [
-                    "302:6:1"
-                  ],
+                  "nameLocations": ["302:6:1"],
                   "nodeType": "IdentifierPath",
                   "referencedDeclaration": 272,
                   "src": "302:6:1"
@@ -11967,9 +11980,7 @@
               "pathNode": {
                 "id": 283,
                 "name": "UserManager",
-                "nameLocations": [
-                  "401:11:1"
-                ],
+                "nameLocations": ["401:11:1"],
                 "nodeType": "IdentifierPath",
                 "referencedDeclaration": 555,
                 "src": "401:11:1"
@@ -12005,9 +12016,7 @@
               "pathNode": {
                 "id": 286,
                 "name": "BookManager",
-                "nameLocations": [
-                  "438:11:1"
-                ],
+                "nameLocations": ["438:11:1"],
                 "nodeType": "IdentifierPath",
                 "referencedDeclaration": 257,
                 "src": "438:11:1"
@@ -12278,9 +12287,7 @@
               "src": "705:634:1",
               "statements": [
                 {
-                  "assignments": [
-                    319
-                  ],
+                  "assignments": [319],
                   "declarations": [
                     {
                       "constant": false,
@@ -12303,10 +12310,7 @@
                         "pathNode": {
                           "id": 317,
                           "name": "BookManager.Book",
-                          "nameLocations": [
-                            "717:11:1",
-                            "729:4:1"
-                          ],
+                          "nameLocations": ["717:11:1", "729:4:1"],
                           "nodeType": "IdentifierPath",
                           "referencedDeclaration": 36,
                           "src": "717:16:1"
@@ -12580,10 +12584,7 @@
                       "id": 325,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        4294967278,
-                        4294967278
-                      ],
+                      "overloadedDeclarations": [4294967278, 4294967278],
                       "referencedDeclaration": 4294967278,
                       "src": "797:7:1",
                       "typeDescriptions": {
@@ -12735,10 +12736,7 @@
                       "id": 339,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        4294967278,
-                        4294967278
-                      ],
+                      "overloadedDeclarations": [4294967278, 4294967278],
                       "referencedDeclaration": 4294967278,
                       "src": "916:7:1",
                       "typeDescriptions": {
@@ -12877,10 +12875,7 @@
                       "id": 349,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        4294967278,
-                        4294967278
-                      ],
+                      "overloadedDeclarations": [4294967278, 4294967278],
                       "referencedDeclaration": 4294967278,
                       "src": "1009:7:1",
                       "typeDescriptions": {
@@ -13391,10 +13386,7 @@
                       "id": 386,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        4294967278,
-                        4294967278
-                      ],
+                      "overloadedDeclarations": [4294967278, 4294967278],
                       "referencedDeclaration": 4294967278,
                       "src": "1405:7:1",
                       "typeDescriptions": {
@@ -13423,9 +13415,7 @@
                   "src": "1405:56:1"
                 },
                 {
-                  "assignments": [
-                    396
-                  ],
+                  "assignments": [396],
                   "declarations": [
                     {
                       "constant": false,
@@ -13448,9 +13438,7 @@
                         "pathNode": {
                           "id": 394,
                           "name": "Borrow",
-                          "nameLocations": [
-                            "1472:6:1"
-                          ],
+                          "nameLocations": ["1472:6:1"],
                           "nodeType": "IdentifierPath",
                           "referencedDeclaration": 272,
                           "src": "1472:6:1"
@@ -13613,10 +13601,7 @@
                       "id": 401,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        4294967278,
-                        4294967278
-                      ],
+                      "overloadedDeclarations": [4294967278, 4294967278],
                       "referencedDeclaration": 4294967278,
                       "src": "1527:7:1",
                       "typeDescriptions": {
@@ -13721,10 +13706,7 @@
                       "id": 410,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        4294967278,
-                        4294967278
-                      ],
+                      "overloadedDeclarations": [4294967278, 4294967278],
                       "referencedDeclaration": 4294967278,
                       "src": "1598:7:1",
                       "typeDescriptions": {
@@ -14139,9 +14121,7 @@
                       "pathNode": {
                         "id": 443,
                         "name": "Borrow",
-                        "nameLocations": [
-                          "1845:6:1"
-                        ],
+                        "nameLocations": ["1845:6:1"],
                         "nodeType": "IdentifierPath",
                         "referencedDeclaration": 272,
                         "src": "1845:6:1"

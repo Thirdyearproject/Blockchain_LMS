@@ -4,13 +4,149 @@
     {
       "inputs": [
         {
-          "internalType": "address",
+          "internalType": "address payable",
           "name": "userManagerAddress",
           "type": "address"
         }
       ],
       "stateMutability": "nonpayable",
       "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "bookIndex",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "proposer",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "bookId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "BookProposed",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "bookIndex",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "voter",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "approved",
+          "type": "bool"
+        }
+      ],
+      "name": "BookVoted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "EtherReceived",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "data",
+          "type": "bytes"
+        }
+      ],
+      "name": "FallbackCalled",
+      "type": "event"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "fallback"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_bookId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "string",
+          "name": "_title",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_author",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_ipfsHash",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_requiredClearance",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_fileType",
+          "type": "uint256"
+        }
+      ],
+      "name": "addBook",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
     },
     {
       "inputs": [
@@ -74,102 +210,71 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [],
-      "name": "userManager",
-      "outputs": [
-        {
-          "internalType": "contract UserManager",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "name": "voted",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "_bookId",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "string",
-          "name": "_title",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "_author",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "_ipfsHash",
-          "type": "string"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_requiredClearance",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_fileType",
-          "type": "uint256"
-        }
-      ],
-      "name": "addBook",
-      "outputs": [],
-      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
-      "inputs": [
+      "inputs": [],
+      "name": "getAllBooks",
+      "outputs": [
         {
-          "internalType": "uint256",
-          "name": "_bookId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bool",
-          "name": "_approve",
-          "type": "bool"
+          "components": [
+            {
+              "internalType": "bytes32",
+              "name": "bookId",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "string",
+              "name": "title",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "author",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "ipfsHash",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "requiredClearance",
+              "type": "uint256"
+            },
+            {
+              "internalType": "enum BookManager.FileType",
+              "name": "fileType",
+              "type": "uint8"
+            },
+            {
+              "internalType": "enum BookManager.Status",
+              "name": "status",
+              "type": "uint8"
+            },
+            {
+              "internalType": "address",
+              "name": "proposer",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "yesVotes",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "noVotes",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct BookManager.Book[]",
+          "name": "",
+          "type": "tuple[]"
         }
       ],
-      "name": "voteOnBook",
-      "outputs": [],
-      "stateMutability": "nonpayable",
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -241,74 +346,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [],
-      "name": "getAllBooks",
-      "outputs": [
-        {
-          "components": [
-            {
-              "internalType": "bytes32",
-              "name": "bookId",
-              "type": "bytes32"
-            },
-            {
-              "internalType": "string",
-              "name": "title",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "author",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "ipfsHash",
-              "type": "string"
-            },
-            {
-              "internalType": "uint256",
-              "name": "requiredClearance",
-              "type": "uint256"
-            },
-            {
-              "internalType": "enum BookManager.FileType",
-              "name": "fileType",
-              "type": "uint8"
-            },
-            {
-              "internalType": "enum BookManager.Status",
-              "name": "status",
-              "type": "uint8"
-            },
-            {
-              "internalType": "address",
-              "name": "proposer",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "yesVotes",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "noVotes",
-              "type": "uint256"
-            }
-          ],
-          "internalType": "struct BookManager.Book[]",
-          "name": "",
-          "type": "tuple[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [],
@@ -321,8 +359,66 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "userManager",
+      "outputs": [
+        {
+          "internalType": "contract UserManager",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_bookId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "_approve",
+          "type": "bool"
+        }
+      ],
+      "name": "voteOnBook",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "voted",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.8.19+commit.7dd6d404\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"userManagerAddress\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_bookId\",\"type\":\"bytes32\"},{\"internalType\":\"string\",\"name\":\"_title\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"_author\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"_ipfsHash\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"_requiredClearance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_fileType\",\"type\":\"uint256\"}],\"name\":\"addBook\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"books\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"bookId\",\"type\":\"bytes32\"},{\"internalType\":\"string\",\"name\":\"title\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"author\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"ipfsHash\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"requiredClearance\",\"type\":\"uint256\"},{\"internalType\":\"enum BookManager.FileType\",\"name\":\"fileType\",\"type\":\"uint8\"},{\"internalType\":\"enum BookManager.Status\",\"name\":\"status\",\"type\":\"uint8\"},{\"internalType\":\"address\",\"name\":\"proposer\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"yesVotes\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"noVotes\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getAllBooks\",\"outputs\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"bookId\",\"type\":\"bytes32\"},{\"internalType\":\"string\",\"name\":\"title\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"author\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"ipfsHash\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"requiredClearance\",\"type\":\"uint256\"},{\"internalType\":\"enum BookManager.FileType\",\"name\":\"fileType\",\"type\":\"uint8\"},{\"internalType\":\"enum BookManager.Status\",\"name\":\"status\",\"type\":\"uint8\"},{\"internalType\":\"address\",\"name\":\"proposer\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"yesVotes\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"noVotes\",\"type\":\"uint256\"}],\"internalType\":\"struct BookManager.Book[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_index\",\"type\":\"uint256\"}],\"name\":\"getBook\",\"outputs\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"bookId\",\"type\":\"bytes32\"},{\"internalType\":\"string\",\"name\":\"title\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"author\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"ipfsHash\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"requiredClearance\",\"type\":\"uint256\"},{\"internalType\":\"enum BookManager.FileType\",\"name\":\"fileType\",\"type\":\"uint8\"},{\"internalType\":\"enum BookManager.Status\",\"name\":\"status\",\"type\":\"uint8\"},{\"internalType\":\"address\",\"name\":\"proposer\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"yesVotes\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"noVotes\",\"type\":\"uint256\"}],\"internalType\":\"struct BookManager.Book\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getBooksCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"userManager\",\"outputs\":[{\"internalType\":\"contract UserManager\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_bookId\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"_approve\",\"type\":\"bool\"}],\"name\":\"voteOnBook\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"voted\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/BookManager.sol\":\"BookManager\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/BookManager.sol\":{\"keccak256\":\"0x42d47a595e7d25c8159cc542a23c963e376afd68f04be0a158feb4b886b6e8e2\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://37ac3d0ef11a0126ebb726d25a002a6e54b48701408e6a65d71b5a9340397ec7\",\"dweb:/ipfs/QmPAMgNYfHLSjY4TV2AB7WRPTxoCv9fhiFHDPaTTq1XB2D\"]},\"project:/contracts/UserManager.sol\":{\"keccak256\":\"0x437c9e76b4ee26d0dce69d52b0516d01710b4799a8b5170499096c24ca91be0c\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://1958809ff44a8848b58c1e42e440c3ee8d6bbb1f7927be50c289c5025919bf80\",\"dweb:/ipfs/QmSG5YGqQh9mdhn8Dfo5tLom36PHMxFgG6nMSFeLhLtgYm\"]}},\"version\":1}",
@@ -16701,12 +16797,8 @@
   "ast": {
     "absolutePath": "project:/contracts/BookManager.sol",
     "exportedSymbols": {
-      "BookManager": [
-        257
-      ],
-      "UserManager": [
-        555
-      ]
+      "BookManager": [257],
+      "UserManager": [555]
     },
     "id": 258,
     "license": "MIT",
@@ -16714,12 +16806,7 @@
     "nodes": [
       {
         "id": 1,
-        "literals": [
-          "solidity",
-          "^",
-          "0.8",
-          ".19"
-        ],
+        "literals": ["solidity", "^", "0.8", ".19"],
         "nodeType": "PragmaDirective",
         "src": "33:24:0"
       },
@@ -16743,9 +16830,7 @@
         "contractKind": "contract",
         "fullyImplemented": true,
         "id": 257,
-        "linearizedBaseContracts": [
-          257
-        ],
+        "linearizedBaseContracts": [257],
         "name": "BookManager",
         "nameLocation": "101:11:0",
         "nodeType": "ContractDefinition",
@@ -16993,9 +17078,7 @@
                   "pathNode": {
                     "id": 24,
                     "name": "FileType",
-                    "nameLocations": [
-                      "385:8:0"
-                    ],
+                    "nameLocations": ["385:8:0"],
                     "nodeType": "IdentifierPath",
                     "referencedDeclaration": 13,
                     "src": "385:8:0"
@@ -17030,9 +17113,7 @@
                   "pathNode": {
                     "id": 27,
                     "name": "Status",
-                    "nameLocations": [
-                      "413:6:0"
-                    ],
+                    "nameLocations": ["413:6:0"],
                     "nodeType": "IdentifierPath",
                     "referencedDeclaration": 6,
                     "src": "413:6:0"
@@ -17159,9 +17240,7 @@
                 "pathNode": {
                   "id": 37,
                   "name": "Book",
-                  "nameLocations": [
-                    "516:4:0"
-                  ],
+                  "nameLocations": ["516:4:0"],
                   "nodeType": "IdentifierPath",
                   "referencedDeclaration": 36,
                   "src": "516:4:0"
@@ -17205,9 +17284,7 @@
               "pathNode": {
                 "id": 41,
                 "name": "UserManager",
-                "nameLocations": [
-                  "542:11:0"
-                ],
+                "nameLocations": ["542:11:0"],
                 "nodeType": "IdentifierPath",
                 "referencedDeclaration": 555,
                 "src": "542:11:0"
@@ -17636,10 +17713,7 @@
                       "id": 76,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        4294967278,
-                        4294967278
-                      ],
+                      "overloadedDeclarations": [4294967278, 4294967278],
                       "referencedDeclaration": 4294967278,
                       "src": "980:7:0",
                       "typeDescriptions": {
@@ -18383,10 +18457,7 @@
                       "id": 119,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        4294967278,
-                        4294967278
-                      ],
+                      "overloadedDeclarations": [4294967278, 4294967278],
                       "referencedDeclaration": 4294967278,
                       "src": "1438:7:0",
                       "typeDescriptions": {
@@ -18540,10 +18611,7 @@
                       "id": 133,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        4294967278,
-                        4294967278
-                      ],
+                      "overloadedDeclarations": [4294967278, 4294967278],
                       "referencedDeclaration": 4294967278,
                       "src": "1536:7:0",
                       "typeDescriptions": {
@@ -18662,10 +18730,7 @@
                       "id": 144,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        4294967278,
-                        4294967278
-                      ],
+                      "overloadedDeclarations": [4294967278, 4294967278],
                       "referencedDeclaration": 4294967278,
                       "src": "1613:7:0",
                       "typeDescriptions": {
@@ -19634,10 +19699,7 @@
                       "id": 224,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        4294967278,
-                        4294967278
-                      ],
+                      "overloadedDeclarations": [4294967278, 4294967278],
                       "referencedDeclaration": 4294967278,
                       "src": "2222:7:0",
                       "typeDescriptions": {
@@ -19777,9 +19839,7 @@
                     "pathNode": {
                       "id": 220,
                       "name": "Book",
-                      "nameLocations": [
-                        "2198:4:0"
-                      ],
+                      "nameLocations": ["2198:4:0"],
                       "nodeType": "IdentifierPath",
                       "referencedDeclaration": 36,
                       "src": "2198:4:0"
@@ -19868,9 +19928,7 @@
                       "pathNode": {
                         "id": 239,
                         "name": "Book",
-                        "nameLocations": [
-                          "2362:4:0"
-                        ],
+                        "nameLocations": ["2362:4:0"],
                         "nodeType": "IdentifierPath",
                         "referencedDeclaration": 36,
                         "src": "2362:4:0"

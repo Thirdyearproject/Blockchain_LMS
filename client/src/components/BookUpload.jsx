@@ -75,10 +75,12 @@ const BookUpload = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!file || !title || !author) {
       alert("Please fill all fields and select a file.");
       return;
     }
+
     if (!contract || !account) {
       alert("Please connect your wallet.");
       return;
@@ -86,6 +88,14 @@ const BookUpload = () => {
 
     setLoading(true);
     try {
+      // Check if the account balance is sufficient
+      const balance = await provider.getBalance(account);
+      const requiredAmount = ethers.parseEther("0.02");
+
+      if (balance < requiredAmount) {
+        return;
+      }
+      // Proceed with uploading the file to IPFS
       const formData = new FormData();
       formData.append("file", file);
 
@@ -113,9 +123,11 @@ const BookUpload = () => {
         0,
         FILE_TYPE_ENUM[fileType],
         {
-          value: ethers.parseEther("0.02"), // 👈 send exactly 0.02 ETH
+          value: requiredAmount, // Send 0.02 ETH if balance is sufficient
         }
       );
+
+      await transaction.wait(); // Wait for the transaction to be mined
 
       alert("Successfully uploaded book and updated contract.");
       resetForm();

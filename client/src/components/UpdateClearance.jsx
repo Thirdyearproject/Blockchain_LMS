@@ -1,27 +1,55 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import UserManagerABI from "../build/contracts/UserManager.json";
 import { RPC_URL, UserAddress } from "../services/apis";
 import { useSelector, useDispatch } from "react-redux";
 
-function UpdateClearance({ privateKey }) {
+function UpdateClearance() {
   const dispatch = useDispatch();
   const signupData = useSelector((state) => state.auth.signupData);
   const [userAddress, setUserAddress] = useState("");
   const [newLevel, setNewLevel] = useState(1);
   const [message, setMessage] = useState("");
+  const [account, setAccount] = useState(null);
+  const [provider, setProvider] = useState(null);
+  const [contract, setContract] = useState(null);
+
+  // MetaMask connection
+  useEffect(() => {
+    if (window.ethereum) {
+      const setupMetaMask = async () => {
+        try {
+          const ethersProvider = new ethers.BrowserProvider(window.ethereum);
+          await ethersProvider.send("eth_requestAccounts", []);
+          const signer = await ethersProvider.getSigner();
+          const userAccount = await signer.getAddress();
+          setAccount(userAccount);
+          setProvider(ethersProvider);
+
+          const contractInstance = new ethers.Contract(
+            UserAddress,
+            UserManagerABI.abi,
+            signer
+          );
+          setContract(contractInstance);
+        } catch (error) {
+          console.error("MetaMask connection error", error);
+          setMessage("❌ Please connect MetaMask.");
+        }
+      };
+      setupMetaMask();
+    } else {
+      setMessage("❌ MetaMask is not installed.");
+    }
+  }, []);
 
   const updateClearance = async () => {
+    if (!contract || !account) {
+      setMessage("❌ Please connect MetaMask.");
+      return;
+    }
+
     try {
-      const provider = new ethers.JsonRpcProvider(RPC_URL);
-      const wallet = new ethers.Wallet(privateKey, provider);
-
-      const contract = new ethers.Contract(
-        UserAddress,
-        UserManagerABI.abi,
-        wallet
-      );
-
       const tx = await contract.setClearance(userAddress, Number(newLevel));
       await tx.wait();
 
@@ -37,7 +65,7 @@ function UpdateClearance({ privateKey }) {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-indigo-100 via-purple-100 to-pink-100 px-4 py-10">
-      <div className="p-8 max-w-md w-full bg-white rounded-3xl shadow-2xl hover:shadow-indigo-300 transition-shadow duration-300">
+      <div className="p-8 max-w-md w-full bg-white rounded-2xl shadow-2xl hover:shadow-indigo-300 transition-shadow duration-300">
         <h3 className="text-4xl font-extrabold text-center text-indigo-600 mb-8">
           Update Clearance
         </h3>
