@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { keccak256, toUtf8Bytes, ethers } from "ethers";
+import { ethers } from "ethers";
 
 import Upload from "../build/contracts/BookManager.json";
 import { RPC_URL, BookAddress } from "../services/apis";
 
-const BookUpload = ({ account, privateKey }) => {
-  const provider = new ethers.JsonRpcProvider(RPC_URL);
-  const wallet = new ethers.Wallet(privateKey, provider);
-
-  const contract = new ethers.Contract(BookAddress, Upload.abi, wallet);
+const BookUpload = () => {
+  const [account, setAccount] = useState(null);
+  const [provider, setProvider] = useState(null);
+  const [signer, setSigner] = useState(null);
+  const [contract, setContract] = useState(null);
 
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState("No file selected");
@@ -28,6 +28,40 @@ const BookUpload = ({ account, privateKey }) => {
     VIDEO: 5,
   };
 
+  // Connect to MetaMask
+  useEffect(() => {
+    const connectWallet = async () => {
+      if (window.ethereum) {
+        try {
+          const webProvider = new ethers.BrowserProvider(window.ethereum);
+          const accounts = await window.ethereum.request({
+            method: "eth_requestAccounts",
+          });
+          const userSigner = await webProvider.getSigner();
+          const bookContract = new ethers.Contract(
+            BookAddress,
+            Upload.abi,
+            userSigner
+          );
+
+          setAccount(accounts[0]);
+          setProvider(webProvider);
+          setSigner(userSigner);
+          setContract(bookContract);
+
+          const balance = await webProvider.getBalance(accounts[0]);
+          console.log(ethers.formatEther(balance)); // in ETH ✅
+        } catch (error) {
+          console.error("Wallet connection error:", error);
+        }
+      } else {
+        alert("Please install MetaMask!");
+      }
+    };
+
+    connectWallet();
+  }, []);
+
   useEffect(() => {
     if (file) {
       if (filePreviewUrl) URL.revokeObjectURL(filePreviewUrl);
@@ -41,48 +75,55 @@ const BookUpload = ({ account, privateKey }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (file && title && author) {
-      setLoading(true);
-      try {
-        const formData = new FormData();
-        formData.append("file", file);
+    if (!file || !title || !author) {
+      alert("Please fill all fields and select a file.");
+      return;
+    }
+    if (!contract || !account) {
+      alert("Please connect your wallet.");
+      return;
+    }
 
-        const resFile = await axios.post(
-          "https://api.pinata.cloud/pinning/pinFileToIPFS",
-          formData,
-          {
-            headers: {
-              pinata_api_key: "51bd33b7307e30887e87",
-              pinata_secret_api_key:
-                "cc803c7cac8712104fa091f7426ec97e4b2c2b955a585e636562dcc51b207cfd",
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
 
-        const ipfsHash = resFile.data.IpfsHash;
+      const resFile = await axios.post(
+        "https://api.pinata.cloud/pinning/pinFileToIPFS",
+        formData,
+        {
+          headers: {
+            pinata_api_key: "51bd33b7307e30887e87",
+            pinata_secret_api_key:
+              "cc803c7cac8712104fa091f7426ec97e4b2c2b955a585e636562dcc51b207cfd",
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
-        const bookId = keccak256(toUtf8Bytes(title + author));
-        const transaction = await contract.addBook(
-          bookId,
-          title,
-          author,
-          ipfsHash, // Use the IPFS hash
-          0,
-          FILE_TYPE_ENUM[fileType]
-        );
-        await transaction.wait();
+      const ipfsHash = resFile.data.IpfsHash;
 
-        alert("Successfully uploaded book and updated contract");
-        resetForm();
-      } catch (error) {
-        console.error("Error uploading book:", error);
-        alert("Unable to upload book to Pinata or update contract");
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      alert("Please fill in all fields and select a file to upload");
+      const bookId = ethers.keccak256(ethers.toUtf8Bytes(title + author));
+      const transaction = await contract.addBook(
+        bookId,
+        title,
+        author,
+        ipfsHash,
+        0,
+        FILE_TYPE_ENUM[fileType],
+        {
+          value: ethers.parseEther("0.02"), // 👈 send exactly 0.02 ETH
+        }
+      );
+
+      alert("Successfully uploaded book and updated contract.");
+      resetForm();
+    } catch (error) {
+      console.error("Error uploading book:", error);
+      alert("Upload failed. Check console for details.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -117,8 +158,7 @@ const BookUpload = ({ account, privateKey }) => {
             aria-label="PDF Preview"
           >
             <p className="text-gray-600">
-              PDF preview not available. <br />
-              Please download to view.
+              PDF preview not available. <br /> Please download to view.
             </p>
           </object>
         ) : fileType === "IMAGE" ? (
@@ -151,84 +191,90 @@ const BookUpload = ({ account, privateKey }) => {
       <h2 className="text-2xl font-semibold text-center text-blue-600 mb-4">
         Upload New Book
       </h2>
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {renderPreview()}
+      {!account ? (
+        <p className="text-center text-red-500">
+          Please connect MetaMask to proceed.
+        </p>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {renderPreview()}
 
-        <div className="space-y-4">
-          <input
-            disabled={!account}
-            type="file"
-            id="file-upload"
-            name="data"
-            onChange={retrieveFile}
-            className="block w-full text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 focus:ring-2 focus:ring-blue-500"
-          />
-          <p className="text-sm italic text-gray-500 break-words">
-            File: {fileName}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block mb-1 font-semibold text-gray-700">
-              Book Title
-            </label>
+          <div className="space-y-4">
             <input
-              type="text"
-              placeholder="Enter book title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              className="block w-full rounded-md border-gray-300 py-2 px-3 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:outline-none"
+              disabled={!account}
+              type="file"
+              id="file-upload"
+              name="data"
+              onChange={retrieveFile}
+              className="block w-full text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 focus:ring-2 focus:ring-blue-500"
             />
+            <p className="text-sm italic text-gray-500 break-words">
+              File: {fileName}
+            </p>
           </div>
 
-          <div>
-            <label className="block mb-1 font-semibold text-gray-700">
-              Author
-            </label>
-            <input
-              type="text"
-              placeholder="Enter author name"
-              value={author}
-              onChange={(e) => setAuthor(e.target.value)}
-              required
-              className="block w-full rounded-md border-gray-300 py-2 px-3 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:outline-none"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block mb-1 font-semibold text-gray-700">
+                Book Title
+              </label>
+              <input
+                type="text"
+                placeholder="Enter book title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                className="block w-full rounded-md border-gray-300 py-2 px-3 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block mb-1 font-semibold text-gray-700">
+                Author
+              </label>
+              <input
+                type="text"
+                placeholder="Enter author name"
+                value={author}
+                onChange={(e) => setAuthor(e.target.value)}
+                required
+                className="block w-full rounded-md border-gray-300 py-2 px-3 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block mb-1 font-semibold text-gray-700">
+                File Type
+              </label>
+              <select
+                value={fileType}
+                onChange={(e) => setFileType(e.target.value)}
+                required
+                className="block w-full rounded-md border-gray-300 py-2 px-3 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:outline-none"
+              >
+                <option value="PDF">PDF</option>
+                <option value="EPUB">EPUB</option>
+                <option value="MOBI">MOBI</option>
+                <option value="TEXT">TEXT</option>
+                <option value="IMAGE">IMAGE</option>
+                <option value="VIDEO">VIDEO</option>
+              </select>
+            </div>
           </div>
 
-          <div>
-            <label className="block mb-1 font-semibold text-gray-700">
-              File Type
-            </label>
-            <select
-              value={fileType}
-              onChange={(e) => setFileType(e.target.value)}
-              required
-              className="block w-full rounded-md border-gray-300 py-2 px-3 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:outline-none"
-            >
-              <option value="PDF">PDF</option>
-              <option value="EPUB">EPUB</option>
-              <option value="MOBI">MOBI</option>
-              <option value="TEXT">TEXT</option>
-              <option value="IMAGE">IMAGE</option>
-              <option value="VIDEO">VIDEO</option>
-            </select>
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          disabled={!file || loading}
-          className={`w-full py-3 rounded-md text-white font-semibold transition duration-300 ${
-            loading || !file
-              ? "bg-blue-300 cursor-not-allowed"
-              : "bg-blue-500 hover:bg-blue-600"
-          }`}
-        >
-          {loading ? "Uploading..." : "Upload Book"}
-        </button>
-      </form>
+          <button
+            type="submit"
+            disabled={!file || loading}
+            className={`w-full py-3 rounded-md text-white font-semibold transition duration-300 ${
+              loading || !file
+                ? "bg-blue-300 cursor-not-allowed"
+                : "bg-blue-500 hover:bg-blue-600"
+            }`}
+          >
+            {loading ? "Uploading..." : "Upload Book"}
+          </button>
+        </form>
+      )}
     </div>
   );
 };

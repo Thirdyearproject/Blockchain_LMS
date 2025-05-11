@@ -1,27 +1,51 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import BookManager from "../build/contracts/BookManager.json"; // Correct contract
-import { RPC_URL, BookAddress } from "../services/apis";
+import { BookAddress } from "../services/apis";
 
-const VoteOnBooks = ({ account, privateKey }) => {
+const VoteOnBooks = () => {
   const [contract, setContract] = useState(null);
   const [books, setBooks] = useState([]);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [account, setAccount] = useState(null);
 
-  const loadPendingBooks = async () => {
+  const connectWallet = async () => {
     try {
-      setLoading(true);
-      const provider = new ethers.JsonRpcProvider(RPC_URL);
-      const wallet = new ethers.Wallet(privateKey, provider);
+      if (!window.ethereum) {
+        setMessage("Please install MetaMask!");
+        return;
+      }
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      const signer = await provider.getSigner();
+      const address = await signer.getAddress();
+      setAccount(address);
 
       const contractInstance = new ethers.Contract(
         BookAddress,
         BookManager.abi,
-        wallet
+        signer
       );
-
       setContract(contractInstance);
+      return contractInstance;
+    } catch (error) {
+      console.error("Wallet connection failed:", error);
+      setMessage("Failed to connect to wallet.");
+      return null;
+    }
+  };
+
+  const loadPendingBooks = async () => {
+    try {
+      setLoading(true);
+      setMessage("");
+
+      let contractInstance = contract;
+      if (!contractInstance) {
+        contractInstance = await connectWallet();
+        if (!contractInstance) return;
+      }
 
       const allBooks = await contractInstance.getAllBooks();
       const pendingBooks = allBooks
@@ -36,7 +60,6 @@ const VoteOnBooks = ({ account, privateKey }) => {
         .filter((book) => book.status === 0); // Only Proposed books
 
       setBooks(pendingBooks);
-      setMessage("");
     } catch (error) {
       console.error("Error loading books:", error);
       setMessage("Failed to load books.");
@@ -46,14 +69,18 @@ const VoteOnBooks = ({ account, privateKey }) => {
   };
 
   const handleVote = async (bookId, approve) => {
-    if (!contract) {
-      setMessage("Contract not ready yet.");
-      return;
-    }
-
     try {
-      const tx = await contract.voteOnBook(bookId, approve);
+      setMessage("");
+
+      let contractInstance = contract;
+      if (!contractInstance) {
+        contractInstance = await connectWallet();
+        if (!contractInstance) return;
+      }
+
+      const tx = await contractInstance.voteOnBook(bookId, approve);
       await tx.wait();
+
       setMessage("Vote submitted successfully!");
       setBooks((prevBooks) => prevBooks.filter((book) => book.id !== bookId));
     } catch (error) {
@@ -69,7 +96,18 @@ const VoteOnBooks = ({ account, privateKey }) => {
           Vote on Pending Books
         </h1>
 
-        {!books.length ? (
+        {!account && (
+          <div className="flex justify-center mb-8">
+            <button
+              onClick={connectWallet}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-full text-lg font-semibold shadow-md hover:shadow-lg transition-all duration-300"
+            >
+              Connect Wallet
+            </button>
+          </div>
+        )}
+
+        {!books.length && account ? (
           <div className="flex justify-center mb-8">
             <button
               onClick={loadPendingBooks}
