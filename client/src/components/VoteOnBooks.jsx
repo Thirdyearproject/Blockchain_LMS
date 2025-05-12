@@ -21,6 +21,7 @@ const VoteOnBooks = () => {
       const signer = await provider.getSigner();
       const address = await signer.getAddress();
       setAccount(address);
+      console.log(BookManager.abi);
 
       const contractInstance = new ethers.Contract(
         BookAddress,
@@ -48,18 +49,25 @@ const VoteOnBooks = () => {
       }
 
       const allBooks = await contractInstance.getAllBooks();
-      const pendingBooks = allBooks
-        .map((book, index) => ({
-          id: index,
-          title: book.title,
-          author: book.author,
-          ipfsHash: book.ipfsHash,
-          requiredClearance: Number(book.requiredClearance),
-          status: Number(book.status),
-        }))
-        .filter((book) => book.status === 0); // Only Proposed books
+      const pendingBooks = await Promise.all(
+        allBooks.map(async (book, index) => {
+          const hasVoted = await contractInstance.voted(index, account);
+          if (!hasVoted && Number(book.status) === 0) {
+            return {
+              id: index,
+              title: book.title,
+              author: book.author,
+              ipfsHash: book.ipfsHash,
+              requiredClearance: Number(book.requiredClearance),
+              status: Number(book.status),
+            };
+          }
+          return null;
+        })
+      );
 
-      setBooks(pendingBooks);
+      const filteredBooks = pendingBooks.filter((b) => b !== null);
+      setBooks(filteredBooks);
     } catch (error) {
       console.error("Error loading books:", error);
       setMessage("Failed to load books.");
